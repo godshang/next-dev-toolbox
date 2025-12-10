@@ -1,65 +1,124 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Navbar, { tools } from '@/components/Navbar';
+import HomePage from '@/components/HomePage';
+import JsonFormat from '@/components/tools/JsonFormat';
+import JsonView from '@/components/tools/JsonView';
+import JsonDiff from '@/components/tools/JsonDiff';
+import JsonToExcel from '@/components/tools/JsonToExcel';
+import JsonYamlConverter from '@/components/tools/JsonYamlConverter';
+import PropertiesYamlConverter from '@/components/tools/PropertiesYamlConverter';
+import ColorConverter from '@/components/tools/ColorConverter';
+import NumberBaseConverter from '@/components/tools/NumberBaseConverter';
+import TimestampConverter from '@/components/tools/TimestampConverter';
+import UuidGenerator from '@/components/tools/UuidGenerator';
+import CronExpressionGenerator from '@/components/tools/CronExpressionGenerator';
+import RandomStringGenerator from '@/components/tools/RandomStringGenerator';
+import QrCodeGenerator from '@/components/tools/QrCodeGenerator';
+import QrCodeReader from '@/components/tools/QrCodeReader';
+import UrlEncode from '@/components/tools/UrlEncode';
+import Base64 from '@/components/tools/Base64';
+
+function HomeContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // 从 URL 参数读取初始工具 ID，避免闪烁
+  const getInitialTool = () => {
+    const toolId = searchParams.get('tool');
+    if (toolId && tools.some(t => t.id === toolId)) {
+      return toolId;
+    }
+    return null; // 返回 null 表示显示主页
+  };
+  
+  const [activeTool, setActiveTool] = useState<string | null>(getInitialTool);
+
+  // 从 URL 参数读取工具 ID（用于 URL 变化时更新）
+  useEffect(() => {
+    const toolId = searchParams.get('tool');
+    if (toolId && tools.some(t => t.id === toolId)) {
+      setActiveTool(toolId);
+    } else {
+      setActiveTool(null); // 没有 tool 参数时显示主页
+    }
+  }, [searchParams]);
+
+  // 处理工具切换，同时更新 URL
+  const handleToolChange = (toolId: string) => {
+    setActiveTool(toolId);
+    router.push(`/?tool=${toolId}`, { scroll: false });
+  };
+
+  const renderContent = () => {
+    // 如果没有选择工具，显示主页
+    if (!activeTool) {
+      return <HomePage />;
+    }
+
+    // 根据工具 ID 渲染对应的工具组件
+    switch (activeTool) {
+      case 'json-format':
+        return <JsonFormat />;
+      case 'json-view':
+        return <JsonView />;
+      case 'json-diff':
+        return <JsonDiff />;
+      case 'json-to-excel':
+        return <JsonToExcel />;
+      case 'json-yaml':
+        return <JsonYamlConverter />;
+      case 'properties-yaml':
+        return <PropertiesYamlConverter />;
+      case 'color-converter':
+        return <ColorConverter />;
+      case 'number-base':
+        return <NumberBaseConverter />;
+      case 'timestamp':
+        return <TimestampConverter />;
+      case 'uuid':
+        return <UuidGenerator />;
+      case 'cron':
+        return <CronExpressionGenerator />;
+      case 'random-string':
+        return <RandomStringGenerator />;
+      case 'qr-code':
+        return <QrCodeGenerator />;
+      case 'qr-reader':
+        return <QrCodeReader />;
+      case 'url-encode':
+        return <UrlEncode />;
+      case 'base64':
+        return <Base64 />;
+      default:
+        return <HomePage />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <Navbar activeTool={activeTool || ''} onToolChange={handleToolChange} />
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto" style={{ minHeight: 'calc(100vh - 8rem)' }}>
+          {renderContent()}
         </div>
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-gray-500 dark:text-gray-400">加载中...</div>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
