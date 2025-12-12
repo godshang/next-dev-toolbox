@@ -12,6 +12,7 @@ import JsonYamlConverter from '@/components/tools/JsonYamlConverter';
 import PropertiesYamlConverter from '@/components/tools/PropertiesYamlConverter';
 import ColorConverter from '@/components/tools/ColorConverter';
 import NumberBaseConverter from '@/components/tools/NumberBaseConverter';
+import SqlFormatter from '@/components/tools/SqlFormatter';
 import TimestampConverter from '@/components/tools/TimestampConverter';
 import UuidGenerator from '@/components/tools/UuidGenerator';
 import CronExpressionGenerator from '@/components/tools/CronExpressionGenerator';
@@ -20,6 +21,7 @@ import QrCodeGenerator from '@/components/tools/QrCodeGenerator';
 import QrCodeReader from '@/components/tools/QrCodeReader';
 import UrlEncode from '@/components/tools/UrlEncode';
 import Base64 from '@/components/tools/Base64';
+import UnicodeCodec from '@/components/tools/UnicodeCodec';
 
 function HomeContent() {
   const router = useRouter();
@@ -76,6 +78,8 @@ function HomeContent() {
         return <ColorConverter />;
       case 'number-base':
         return <NumberBaseConverter />;
+      case 'sql-formatter':
+        return <SqlFormatter />;
       case 'timestamp':
         return <TimestampConverter />;
       case 'uuid':
@@ -92,6 +96,8 @@ function HomeContent() {
         return <UrlEncode />;
       case 'base64':
         return <Base64 />;
+      case 'unicode-codec':
+        return <UnicodeCodec />;
       default:
         return <HomePage />;
     }

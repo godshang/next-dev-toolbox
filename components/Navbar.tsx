@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-export type ToolCategory = 'JSON' | 'Converter' | 'Generation' | 'Codec';
+export type ToolCategory = 'JSON' | 'Converter' | 'Generation' | 'Codec' | 'Formatter';
 export type ToolItem = {
   id: string;
   name: string;
@@ -23,6 +23,8 @@ export const tools: ToolItem[] = [
   { id: 'properties-yaml', name: 'Properties ↔ YAML', category: 'Converter', icon: '⚙️' },
   { id: 'color-converter', name: '颜色格式转换', category: 'Converter', icon: '🎨' },
   { id: 'number-base', name: '进制转换', category: 'Converter', icon: '🔢' },
+  // Formatter 工具
+  { id: 'sql-formatter', name: 'SQL 格式化', category: 'Formatter', icon: '🗄️' },
   // Generation 工具
   { id: 'uuid', name: 'UUID 生成器', category: 'Generation', icon: '🆔' },
   { id: 'cron', name: 'CRON 表达式解析', category: 'Generation', icon: '⏰' },
@@ -32,6 +34,7 @@ export const tools: ToolItem[] = [
   // Codec 工具
   { id: 'url-encode', name: 'URL 编解码', category: 'Codec', icon: '🔗' },
   { id: 'base64', name: 'Base64 编解码', category: 'Codec', icon: '📦' },
+  { id: 'unicode-codec', name: 'Unicode 编解码', category: 'Codec', icon: '🔤' },
 ];
 
 // 分类图标映射
@@ -40,6 +43,7 @@ const categoryIcons: Record<ToolCategory, string> = {
   'Converter': '🔄',
   'Generation': '✨',
   'Codec': '🔐',
+  'Formatter': '🎨',
 };
 
 // 分类中文名称映射
@@ -48,6 +52,7 @@ const categoryNames: Record<ToolCategory, string> = {
   'Converter': '转换工具',
   'Generation': '生成工具',
   'Codec': '编解码',
+  'Formatter': '格式化',
 };
 
 interface NavbarProps {
@@ -60,7 +65,7 @@ export default function Navbar({ activeTool, onToolChange }: NavbarProps) {
   const [expandedCategory, setExpandedCategory] = useState<ToolCategory | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec'];
+  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec', 'Formatter'];
 
   const toggleCategory = (category: ToolCategory) => {
     setExpandedCategory(expandedCategory === category ? null : category);
