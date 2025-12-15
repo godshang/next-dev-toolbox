@@ -25,15 +25,15 @@ const highlightJSON = (text: string): string => {
   );
   
   // 2. 高亮字符串值（不在键名位置的字符串，即不在冒号前的）
-  // 匹配 : "value" 或 , "value" 格式
+  // 匹配 : "value" 或 , "value" 或 [ "value" 格式（数组第一个元素）
   highlighted = highlighted.replace(
-    /(:\s*|,\s*)"([^"\\]|\\.)*"/g,
+    /(:\s*|,\s*|\[\s*)"([^"\\]|\\.)*"/g,
     (match) => {
       // 如果已经包含高亮标签，跳过
       if (match.includes('<span')) {
         return match;
       }
-      const valueMatch = match.match(/(:\s*|,\s*)"([^"]+)"/);
+      const valueMatch = match.match(/(:\s*|,\s*|\[\s*)"([^"]+)"/);
       if (valueMatch) {
         return `${valueMatch[1]}<span class="text-green-600 dark:text-green-400">"${valueMatch[2]}"</span>`;
       }
@@ -42,14 +42,15 @@ const highlightJSON = (text: string): string => {
   );
   
   // 3. 高亮数字（不在字符串内）
+  // 匹配 : 123 或 , 123 或 [ 123 格式（数组第一个元素）
   highlighted = highlighted.replace(
-    /(:\s*|,\s*)(\d+\.?\d*)/g,
+    /(:\s*|,\s*|\[\s*)(\d+\.?\d*)/g,
     (match) => {
       // 如果已经包含高亮标签，跳过
       if (match.includes('<span')) {
         return match;
       }
-      const numMatch = match.match(/(:\s*|,\s*)(\d+\.?\d*)/);
+      const numMatch = match.match(/(:\s*|,\s*|\[\s*)(\d+\.?\d*)/);
       if (numMatch) {
         return `${numMatch[1]}<span class="text-blue-600 dark:text-blue-400">${numMatch[2]}</span>`;
       }
@@ -58,14 +59,15 @@ const highlightJSON = (text: string): string => {
   );
   
   // 4. 高亮布尔值和 null
+  // 匹配 : true 或 , true 或 [ true 格式（数组第一个元素）
   highlighted = highlighted.replace(
-    /(:\s*|,\s*)(true|false|null)\b/g,
+    /(:\s*|,\s*|\[\s*)(true|false|null)\b/g,
     (match) => {
       // 如果已经包含高亮标签，跳过
       if (match.includes('<span')) {
         return match;
       }
-      const boolMatch = match.match(/(:\s*|,\s*)(true|false|null)/);
+      const boolMatch = match.match(/(:\s*|,\s*|\[\s*)(true|false|null)/);
       if (boolMatch) {
         return `${boolMatch[1]}<span class="text-purple-600 dark:text-purple-400 font-semibold">${boolMatch[2]}</span>`;
       }
