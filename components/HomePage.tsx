@@ -9,6 +9,7 @@ const categoryIcons: Record<ToolCategory, string> = {
   'Generation': '✨',
   'Codec': '🔐',
   'Formatter': '🎨',
+  'Crypto': '🔐',
 };
 
 const categoryNames: Record<ToolCategory, string> = {
@@ -17,6 +18,7 @@ const categoryNames: Record<ToolCategory, string> = {
   'Generation': '生成工具',
   'Codec': '编解码',
   'Formatter': '格式化',
+  'Crypto': '加解密',
 };
 
 const categoryDescriptions: Record<ToolCategory, string> = {
@@ -25,6 +27,7 @@ const categoryDescriptions: Record<ToolCategory, string> = {
   'Generation': '生成唯一标识符和随机数据',
   'Codec': '编码和解码工具',
   'Formatter': '代码格式化和美化工具',
+  'Crypto': '加密、解密和哈希工具',
 };
 
 export default function HomePage() {
@@ -34,7 +37,7 @@ export default function HomePage() {
     router.push(`/?tool=${toolId}`);
   };
 
-  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec', 'Formatter'];
+  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec', 'Formatter', 'Crypto'];
 
   return (
     <div className="w-full">

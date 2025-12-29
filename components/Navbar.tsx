@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-export type ToolCategory = 'JSON' | 'Converter' | 'Generation' | 'Codec' | 'Formatter';
+export type ToolCategory = 'JSON' | 'Converter' | 'Generation' | 'Codec' | 'Formatter' | 'Crypto';
 export type ToolItem = {
   id: string;
   name: string;
@@ -35,6 +35,8 @@ export const tools: ToolItem[] = [
   { id: 'url-encode', name: 'URL 编解码', category: 'Codec', icon: '🔗' },
   { id: 'base64', name: 'Base64 编解码', category: 'Codec', icon: '📦' },
   { id: 'unicode-codec', name: 'Unicode 编解码', category: 'Codec', icon: '🔤' },
+  // Crypto 工具
+  { id: 'hash', name: '哈希', category: 'Crypto', icon: '🔒' },
 ];
 
 // 分类图标映射
@@ -44,6 +46,7 @@ const categoryIcons: Record<ToolCategory, string> = {
   'Generation': '✨',
   'Codec': '🔐',
   'Formatter': '🎨',
+  'Crypto': '🔐',
 };
 
 // 分类中文名称映射
@@ -53,6 +56,7 @@ const categoryNames: Record<ToolCategory, string> = {
   'Generation': '生成工具',
   'Codec': '编解码',
   'Formatter': '格式化',
+  'Crypto': '加解密',
 };
 
 interface NavbarProps {
@@ -65,7 +69,7 @@ export default function Navbar({ activeTool, onToolChange }: NavbarProps) {
   const [expandedCategory, setExpandedCategory] = useState<ToolCategory | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec', 'Formatter'];
+  const categories: ToolCategory[] = ['JSON', 'Converter', 'Generation', 'Codec', 'Formatter', 'Crypto'];
 
   const toggleCategory = (category: ToolCategory) => {
     setExpandedCategory(expandedCategory === category ? null : category);

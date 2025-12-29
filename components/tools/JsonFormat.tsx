@@ -7,73 +7,101 @@ const highlightJSON = (text: string): string => {
   if (!text.trim()) return '';
   
   // 转义 HTML
-  let highlighted = escapeHtml(text);
+  const escaped = escapeHtml(text);
   
-  // 标记已处理的位置，避免重复处理
-  const processed = new Set<number>();
+  // 存储所有需要高亮的片段
+  const parts: Array<{ start: number; end: number; type: 'key' | 'string' | 'number' | 'boolean' | 'null'; content: string }> = [];
   
-  // 1. 先高亮键名（"key": 格式，后面跟着冒号）
-  highlighted = highlighted.replace(
-    /"([^"\\]|\\.)*":/g,
-    (match, offset) => {
-      const keyMatch = match.match(/^"([^"]+)":$/);
-      if (keyMatch) {
-        return `<span class="text-red-600 dark:text-red-400 font-semibold">"${keyMatch[1]}"</span>:`;
+  // 正确匹配JSON字符串的正则（包括转义字符）
+  // 匹配: "..." 其中可以包含转义的引号、反斜杠等
+  const stringRegex = /"((?:[^"\\]|\\.)*)"/g;
+  let match;
+  
+  // 1. 找到所有字符串并判断是键名还是值
+  while ((match = stringRegex.exec(escaped)) !== null) {
+    const fullMatch = match[0];
+    const content = match[1];
+    const start = match.index;
+    const end = start + fullMatch.length;
+    
+    // 检查后面是否跟着冒号（键名）
+    const afterText = escaped.substring(end);
+    if (/^\s*:/.test(afterText)) {
+      parts.push({ start, end, type: 'key', content: fullMatch });
+    } else {
+      // 检查前面是否有冒号、逗号或左方括号（字符串值）
+      const beforeText = escaped.substring(0, start);
+      if (/[:,\[]\s*$/.test(beforeText)) {
+        parts.push({ start, end, type: 'string', content: fullMatch });
       }
-      return match;
     }
-  );
+  }
   
-  // 2. 高亮字符串值（不在键名位置的字符串，即不在冒号前的）
-  // 匹配 : "value" 或 , "value" 或 [ "value" 格式（数组第一个元素）
-  highlighted = highlighted.replace(
-    /(:\s*|,\s*|\[\s*)"([^"\\]|\\.)*"/g,
-    (match) => {
-      // 如果已经包含高亮标签，跳过
-      if (match.includes('<span')) {
-        return match;
-      }
-      const valueMatch = match.match(/(:\s*|,\s*|\[\s*)"([^"]+)"/);
-      if (valueMatch) {
-        return `${valueMatch[1]}<span class="text-green-600 dark:text-green-400">"${valueMatch[2]}"</span>`;
-      }
-      return match;
+  // 2. 找到所有数字（不在字符串内）
+  const numberRegex = /(:\s*|,\s*|\[\s*)(\d+\.?\d*)/g;
+  while ((match = numberRegex.exec(escaped)) !== null) {
+    const prefix = match[1];
+    const number = match[2];
+    const start = match.index + prefix.length;
+    const end = start + number.length;
+    
+    // 检查是否在字符串内
+    const inString = parts.some(p => 
+      (p.type === 'key' || p.type === 'string') && 
+      start >= p.start && end <= p.end
+    );
+    
+    if (!inString) {
+      parts.push({ start, end, type: 'number', content: number });
     }
-  );
+  }
   
-  // 3. 高亮数字（不在字符串内）
-  // 匹配 : 123 或 , 123 或 [ 123 格式（数组第一个元素）
-  highlighted = highlighted.replace(
-    /(:\s*|,\s*|\[\s*)(\d+\.?\d*)/g,
-    (match) => {
-      // 如果已经包含高亮标签，跳过
-      if (match.includes('<span')) {
-        return match;
-      }
-      const numMatch = match.match(/(:\s*|,\s*|\[\s*)(\d+\.?\d*)/);
-      if (numMatch) {
-        return `${numMatch[1]}<span class="text-blue-600 dark:text-blue-400">${numMatch[2]}</span>`;
-      }
-      return match;
+  // 3. 找到所有布尔值和null（不在字符串内）
+  const booleanRegex = /(:\s*|,\s*|\[\s*)(true|false|null)\b/g;
+  while ((match = booleanRegex.exec(escaped)) !== null) {
+    const prefix = match[1];
+    const value = match[2];
+    const start = match.index + prefix.length;
+    const end = start + value.length;
+    
+    // 检查是否在字符串内
+    const inString = parts.some(p => 
+      (p.type === 'key' || p.type === 'string') && 
+      start >= p.start && end <= p.end
+    );
+    
+    if (!inString) {
+      parts.push({ start, end, type: value === 'null' ? 'null' : 'boolean', content: value });
     }
-  );
+  }
   
-  // 4. 高亮布尔值和 null
-  // 匹配 : true 或 , true 或 [ true 格式（数组第一个元素）
-  highlighted = highlighted.replace(
-    /(:\s*|,\s*|\[\s*)(true|false|null)\b/g,
-    (match) => {
-      // 如果已经包含高亮标签，跳过
-      if (match.includes('<span')) {
-        return match;
-      }
-      const boolMatch = match.match(/(:\s*|,\s*|\[\s*)(true|false|null)/);
-      if (boolMatch) {
-        return `${boolMatch[1]}<span class="text-purple-600 dark:text-purple-400 font-semibold">${boolMatch[2]}</span>`;
-      }
-      return match;
+  // 按位置排序，从后往前替换，避免位置偏移
+  parts.sort((a, b) => b.start - a.start);
+  
+  let highlighted = escaped;
+  for (const part of parts) {
+    const before = highlighted.substring(0, part.start);
+    const after = highlighted.substring(part.end);
+    let replacement = '';
+    
+    switch (part.type) {
+      case 'key':
+        replacement = `<span class="text-red-600 dark:text-red-400 font-semibold">${part.content}</span>`;
+        break;
+      case 'string':
+        replacement = `<span class="text-green-600 dark:text-green-400">${part.content}</span>`;
+        break;
+      case 'number':
+        replacement = `<span class="text-blue-600 dark:text-blue-400">${part.content}</span>`;
+        break;
+      case 'boolean':
+      case 'null':
+        replacement = `<span class="text-purple-600 dark:text-purple-400 font-semibold">${part.content}</span>`;
+        break;
     }
-  );
+    
+    highlighted = before + replacement + after;
+  }
   
   return highlighted;
 };
