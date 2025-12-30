@@ -152,7 +152,7 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
     <>
       <div className="select-none" ref={nodeRef}>
         <div
-          className="flex items-center gap-1.5 py-0.5 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded px-2 -mx-2 transition-colors"
+          className="flex items-center gap-1.5 py-0.5 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded px-2 -mx-2 transition-colors whitespace-nowrap"
           style={{ paddingLeft: `${indentWidth + 8}px` }}
           onContextMenu={handleContextMenu}
         >
@@ -356,7 +356,7 @@ export default function JsonView() {
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               Tree View
             </label>
-            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-y-auto overflow-x-hidden p-4 min-h-0">
+            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-y-auto overflow-x-auto p-4 min-h-0">
               {parsedData ? (
                 <div className="font-mono text-sm">
                   <TreeNode data={parsedData} />
