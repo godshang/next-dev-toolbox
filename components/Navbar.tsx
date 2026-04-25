@@ -33,6 +33,7 @@ export const tools: ToolItem[] = [
   { id: 'qr-reader', name: '二维码识别', category: 'Generation', icon: '🔍' },
   // Codec 工具
   { id: 'url-encode', name: 'URL 编解码', category: 'Codec', icon: '🔗' },
+  { id: 'url-compare', name: 'URL 参数比较', category: 'Codec', icon: '🔍' },
   { id: 'base64', name: 'Base64 编解码', category: 'Codec', icon: '📦' },
   { id: 'unicode-codec', name: 'Unicode 编解码', category: 'Codec', icon: '🔤' },
   // Crypto 工具

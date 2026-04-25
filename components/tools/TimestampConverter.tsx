@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-// 将Date对象转换为本地时间的datetime-local格式字符串
-const formatLocalDateTime = (date: Date): string => {
+// 将Date对象转换为 yyyy-MM-dd HH:mm:ss
+const formatDateTime = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
 export default function TimestampConverter() {
@@ -21,18 +22,10 @@ export default function TimestampConverter() {
     const num = parseInt(ts);
     if (!isNaN(num)) {
       const date = new Date(num);
-      // 更新datetime-local输入框的值（使用本地时间）
-      setDateTime(formatLocalDateTime(date));
+      setDateTime(formatDateTime(date));
       setResult({
         timestamp: num,
-        dateTime: date.toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        }),
+        dateTime: formatDateTime(date),
       });
     }
   }, []);
@@ -41,28 +34,20 @@ export default function TimestampConverter() {
     const now = Date.now();
     setTimestamp(String(now));
     const localDate = new Date(now);
-    setDateTime(formatLocalDateTime(localDate));
+    setDateTime(formatDateTime(localDate));
     handleTimestampToDate(String(now));
   }, [handleTimestampToDate]);
 
 
   const handleDateToTimestamp = (dt: string) => {
     if (dt) {
-      // datetime-local输入框返回的是本地时间字符串（格式：YYYY-MM-DDTHH:mm）
-      // new Date()会将其解析为本地时间，这是正确的
-      const date = new Date(dt);
+      // 支持 YYYY-MM-DD HH:mm:ss 以及 YYYY-MM-DDTHH:mm:ss
+      const normalized = dt.includes(' ') ? dt.replace(' ', 'T') : dt;
+      const date = new Date(normalized);
       if (!isNaN(date.getTime())) {
-        const localDateTime = date.toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        });
         setResult({
           timestamp: date.getTime(),
-          dateTime: localDateTime,
+          dateTime: formatDateTime(date),
         });
         setTimestamp(String(date.getTime()));
       }
@@ -136,9 +121,10 @@ export default function TimestampConverter() {
               </label>
               <div className="flex gap-3">
                 <input
-                  type="datetime-local"
+                  type="text"
                   value={dateTime}
                   onChange={handleDateTimeChange}
+                  placeholder="yyyy-MM-dd HH:mm:ss"
                   className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 {result.dateTime && (

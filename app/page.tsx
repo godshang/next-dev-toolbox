@@ -20,6 +20,7 @@ import RandomStringGenerator from '@/components/tools/RandomStringGenerator';
 import QrCodeGenerator from '@/components/tools/QrCodeGenerator';
 import QrCodeReader from '@/components/tools/QrCodeReader';
 import UrlEncode from '@/components/tools/UrlEncode';
+import UrlCompare from '@/components/tools/UrlCompare';
 import Base64 from '@/components/tools/Base64';
 import UnicodeCodec from '@/components/tools/UnicodeCodec';
 import Hash from '@/components/tools/Hash';
@@ -95,6 +96,8 @@ function HomeContent() {
         return <QrCodeReader />;
       case 'url-encode':
         return <UrlEncode />;
+      case 'url-compare':
+        return <UrlCompare />;
       case 'base64':
         return <Base64 />;
       case 'unicode-codec':

@@ -4,18 +4,23 @@ import { useState } from 'react';
 
 export default function UuidGenerator() {
   const [count, setCount] = useState(1);
+  const [removeHyphens, setRemoveHyphens] = useState(false);
+  const [uppercase, setUppercase] = useState(false);
   const [uuids, setUuids] = useState<string[]>([]);
 
-  const generateUUID = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  const generateUUID = (noHyphens: boolean, useUppercase: boolean) => {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
       const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
+
+    const formatted = noHyphens ? uuid.replace(/-/g, '') : uuid;
+    return useUppercase ? formatted.toUpperCase() : formatted.toLowerCase();
   };
 
   const handleGenerate = () => {
-    const newUuids = Array.from({ length: count }, () => generateUUID());
+    const newUuids = Array.from({ length: count }, () => generateUUID(removeHyphens, uppercase));
     setUuids(newUuids);
   };
 
@@ -62,6 +67,28 @@ export default function UuidGenerator() {
                 Copy All
               </button>
             )}
+          </div>
+          <div className="mt-4 flex items-center gap-6 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={removeHyphens}
+                onChange={(e) => setRemoveHyphens(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              删除短横线
+            </label>
+            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <span className="font-semibold">大小写:</span>
+              <select
+                value={uppercase ? 'uppercase' : 'lowercase'}
+                onChange={(e) => setUppercase(e.target.value === 'uppercase')}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              >
+                <option value="uppercase">大写</option>
+                <option value="lowercase">小写</option>
+              </select>
+            </div>
           </div>
         </div>
 
