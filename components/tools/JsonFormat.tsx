@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 
 // JSON 语法高亮函数
 const highlightJSON = (text: string): string => {
@@ -117,18 +117,23 @@ export default function JsonFormat() {
   const [error, setError] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
+  const lineNumberRef = useRef<HTMLDivElement>(null);
 
-  // 同步滚动
+  const lineCount = useMemo(() => Math.max(1, content.split('\n').length), [content]);
+
+  // 同步滚动（高亮层 + 行号）
   useEffect(() => {
     const textarea = textareaRef.current;
     const highlight = highlightRef.current;
-    
-    if (textarea && highlight) {
+    const lineNumbers = lineNumberRef.current;
+
+    if (textarea && highlight && lineNumbers) {
       const handleScroll = () => {
         highlight.scrollTop = textarea.scrollTop;
         highlight.scrollLeft = textarea.scrollLeft;
+        lineNumbers.scrollTop = textarea.scrollTop;
       };
-      
+
       textarea.addEventListener('scroll', handleScroll);
       return () => textarea.removeEventListener('scroll', handleScroll);
     }
@@ -217,39 +222,55 @@ export default function JsonFormat() {
       </div>
       
       {/* 编辑器区域 */}
-      <div className="flex-1 relative overflow-hidden bg-gray-50 dark:bg-gray-950">
-        {/* 语法高亮层 */}
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-gray-50 dark:bg-gray-950">
+        {/* 行号 */}
         <div
-          ref={highlightRef}
-          className="absolute inset-0 p-6 overflow-auto font-mono text-sm whitespace-pre-wrap break-words pointer-events-none"
+          ref={lineNumberRef}
+          className="flex-shrink-0 overflow-hidden py-6 pl-4 pr-3 border-r border-gray-200 dark:border-gray-800 bg-gray-100/80 dark:bg-gray-900/80 text-gray-400 dark:text-gray-500 font-mono text-sm leading-6 tabular-nums select-none"
+          style={{ minWidth: `${String(lineCount).length + 1.5}ch` }}
         >
-          {content ? (
-            <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />
-          ) : (
-            <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="text-4xl mb-2">📝</div>
-                <div className="text-lg font-medium">在此粘贴或输入 JSON...</div>
-                <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">支持实时语法高亮</div>
-              </div>
+          {Array.from({ length: lineCount }, (_, i) => (
+            <div key={i} className="leading-6">
+              {i + 1}
             </div>
-          )}
+          ))}
         </div>
-        
-        {/* 输入层 */}
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value);
-            setError('');
-          }}
-          className="absolute inset-0 w-full h-full p-6 border-0 bg-transparent text-transparent caret-blue-600 dark:caret-blue-400 font-mono text-sm resize-none focus:outline-none overflow-auto"
-          placeholder=""
-          style={{
-            caretColor: '#2563eb',
-          }}
-        />
+
+        <div className="relative flex-1 min-w-0">
+          {/* 语法高亮层 */}
+          <div
+            ref={highlightRef}
+            className="absolute inset-0 p-6 overflow-auto font-mono text-sm leading-6 whitespace-pre pointer-events-none"
+          >
+            {content ? (
+              <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />
+            ) : (
+              <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📝</div>
+                  <div className="text-lg font-medium">在此粘贴或输入 JSON...</div>
+                  <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">支持实时语法高亮</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 输入层 */}
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+              setError('');
+            }}
+            className="absolute inset-0 w-full h-full p-6 border-0 bg-transparent text-transparent caret-blue-600 dark:caret-blue-400 font-mono text-sm leading-6 whitespace-pre resize-none focus:outline-none overflow-auto"
+            placeholder=""
+            spellCheck={false}
+            style={{
+              caretColor: '#2563eb',
+            }}
+          />
+        </div>
       </div>
     </div>
   );

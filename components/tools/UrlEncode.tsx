@@ -65,9 +65,18 @@ export default function UrlEncode() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Input
-            </label>
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Input
+              </label>
+              {/* 与右侧 Copy 同尺寸占位，保证两侧文本框顶部对齐 */}
+              <span
+                className="px-4 py-2 text-sm font-medium rounded-lg invisible pointer-events-none select-none"
+                aria-hidden
+              >
+                Copy
+              </span>
+            </div>
             <textarea
               value={input}
               onChange={(e) => handleInputChange(e.target.value)}
@@ -76,8 +85,8 @@ export default function UrlEncode() {
             />
           </div>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Output
               </label>
               <button
