@@ -6,14 +6,19 @@
     "dev": "WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "cron-parser": "^4.9.0",
     "crypto-js": "^4.2.0",
+    "diff": "^9.0.0",
+    "fast-xml-parser": "^5.8.0",
     "js-yaml": "^4.1.1",
     "jsqr": "^1.4.0",
     "next": "16.0.7",
+    "papaparse": "^5.5.3",
     "qrcode": "^1.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -24,14 +29,17 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/crypto-js": "^4.2.2",
+    "@types/diff": "^7.0.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }
