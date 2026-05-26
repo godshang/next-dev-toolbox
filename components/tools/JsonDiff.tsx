@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // JSON 语法高亮函数
 const highlightJSON = (text: string): string => {
@@ -348,6 +349,8 @@ function DiffTreeNode({ node, level = 0, keyName }: DiffTreeNodeProps) {
 }
 
 export default function JsonDiff() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('json-diff');
   const [json1, setJson1] = useState('');
   const [json2, setJson2] = useState('');
   const [error1, setError1] = useState('');
@@ -408,18 +411,18 @@ export default function JsonDiff() {
         try {
           JSON.parse(json1);
         } catch {
-          setError1('第一个 JSON 格式错误');
+          setError1(t('errorJson1'));
         }
       }
       if (json2.trim()) {
         try {
           JSON.parse(json2);
         } catch {
-          setError2('第二个 JSON 格式错误');
+          setError2(t('errorJson2'));
         }
       }
     }
-  }, [json1, json2]);
+  }, [json1, json2, t]);
 
   const handleFormat = (json: string, setJson: (value: string) => void, setError: (error: string) => void) => {
     if (!json.trim()) return;
@@ -429,7 +432,7 @@ export default function JsonDiff() {
       const formatted = JSON.stringify(parsed, null, 2);
       setJson(formatted);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -449,15 +452,15 @@ export default function JsonDiff() {
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">JSON Diff</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">比较两个 JSON 的差异</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tool?.description}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -470,13 +473,13 @@ export default function JsonDiff() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                JSON 1 (旧版本)
+                {t('labelJson1')}
               </label>
               <button
                 onClick={() => handleFormat(json1, setJson1, setError1)}
                 className="px-3 py-1.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
               >
-                格式化
+                {tc('common.format')}
               </button>
             </div>
             <div className="flex-1 relative min-h-[300px]">
@@ -488,7 +491,7 @@ export default function JsonDiff() {
                 {json1 ? (
                   <div dangerouslySetInnerHTML={{ __html: highlightedJson1 }} />
                 ) : (
-                  <div className="text-gray-400 dark:text-gray-500">输入第一个 JSON...</div>
+                  <div className="text-gray-400 dark:text-gray-500">{t('emptyJson1')}</div>
                 )}
               </div>
               
@@ -519,13 +522,13 @@ export default function JsonDiff() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                JSON 2 (新版本)
+                {t('labelJson2')}
               </label>
               <button
                 onClick={() => handleFormat(json2, setJson2, setError2)}
                 className="px-3 py-1.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
               >
-                格式化
+                {tc('common.format')}
               </button>
             </div>
             <div className="flex-1 relative min-h-[300px]">
@@ -537,7 +540,7 @@ export default function JsonDiff() {
                 {json2 ? (
                   <div dangerouslySetInnerHTML={{ __html: highlightedJson2 }} />
                 ) : (
-                  <div className="text-gray-400 dark:text-gray-500">输入第二个 JSON...</div>
+                  <div className="text-gray-400 dark:text-gray-500">{t('emptyJson2')}</div>
                 )}
               </div>
               
@@ -569,20 +572,20 @@ export default function JsonDiff() {
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              差异对比
+              {t('labelDiff')}
             </label>
             <div className="flex gap-3 text-xs">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded"></span>
-                <span>新增</span>
+                <span>{t('legendAdded')}</span>
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded"></span>
-                <span>删除</span>
+                <span>{t('legendRemoved')}</span>
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded"></span>
-                <span>修改</span>
+                <span>{t('legendModified')}</span>
               </span>
             </div>
           </div>
@@ -595,7 +598,7 @@ export default function JsonDiff() {
               <div className="text-gray-400 dark:text-gray-500 text-sm flex items-center justify-center h-full min-h-[200px]">
                 <div className="text-center">
                   <div className="text-4xl mb-2">🔍</div>
-                  <div>输入两个 JSON 后，差异将显示在这里</div>
+                  <div>{t('emptyDiff')}</div>
                 </div>
               </div>
             )}

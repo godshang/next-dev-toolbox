@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import * as yaml from 'js-yaml';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // Properties 语法高亮函数
 const highlightProperties = (text: string): string => {
@@ -223,6 +224,8 @@ function objectToProperties(obj: any, prefix: string = ''): string {
 }
 
 export default function PropertiesYamlConverter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('properties-yaml');
   const [propertiesContent, setPropertiesContent] = useState('');
   const [yamlContent, setYamlContent] = useState('');
   const [error, setError] = useState('');
@@ -288,9 +291,10 @@ export default function PropertiesYamlConverter() {
       setError('');
       isUpdatingRef.current = false;
     } catch (e) {
-      setError('Properties 格式错误: ' + (e instanceof Error ? e.message : String(e)));
+      const detail = e instanceof Error ? e.message : String(e);
+      setError(`${tc('common.parseFailed')}: ${detail}`);
     }
-  }, []);
+  }, [tc]);
 
   // YAML 转 Properties
   const convertYamlToProperties = useCallback((yamlStr: string) => {
@@ -312,9 +316,9 @@ export default function PropertiesYamlConverter() {
       setError('');
       isUpdatingRef.current = false;
     } catch (e) {
-      setError('YAML 格式错误: ' + (e instanceof Error ? e.message : String(e)));
+      setError(tc('common.yamlFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
-  }, []);
+  }, [tc]);
 
   // 处理 Properties 输入变化
   const handlePropertiesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -356,15 +360,15 @@ export default function PropertiesYamlConverter() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Properties ↔ YAML 转换</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Properties 和 YAML 格式互相转换</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -383,14 +387,14 @@ export default function PropertiesYamlConverter() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Properties
+                {t('labelProperties')}
               </label>
               {propertiesContent && (
                 <button
                   onClick={handleCopyProperties}
                   className="px-3 py-1.5 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -406,7 +410,7 @@ export default function PropertiesYamlConverter() {
                   <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="text-4xl mb-2">⚙️</div>
-                      <div className="text-lg font-medium">在此输入 Properties...</div>
+                      <div className="text-lg font-medium">{t('emptyProperties')}</div>
                     </div>
                   </div>
                 )}
@@ -430,14 +434,14 @@ export default function PropertiesYamlConverter() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                YAML
+                {t('labelYaml')}
               </label>
               {yamlContent && (
                 <button
                   onClick={handleCopyYaml}
                   className="px-3 py-1.5 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -453,7 +457,7 @@ export default function PropertiesYamlConverter() {
                   <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="text-4xl mb-2">📝</div>
-                      <div className="text-lg font-medium">在此输入 YAML...</div>
+                      <div className="text-lg font-medium">{t('emptyYaml')}</div>
                     </div>
                   </div>
                 )}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // JSON 语法高亮函数
 const highlightJSON = (text: string): string => {
@@ -395,6 +396,8 @@ function generateExcelData(jsonData: any): { headers: string[][], data: any[][],
 }
 
 export default function JsonToExcel() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('json-to-excel');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [preview, setPreview] = useState<{ headers: string[][], data: any[][], merges: any[] } | null>(null);
@@ -435,10 +438,10 @@ export default function JsonToExcel() {
         merges: excelData.merges, // 添加合并信息
       });
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
       setPreview(null);
     }
-  }, [content]);
+  }, [content, tc]);
 
   const handleFormat = () => {
     try {
@@ -447,7 +450,7 @@ export default function JsonToExcel() {
       const formatted = JSON.stringify(parsed, null, 2);
       setContent(formatted);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -531,7 +534,7 @@ export default function JsonToExcel() {
       // 生成文件并下载
       XLSX.writeFile(wb, 'json-to-excel.xlsx');
     } catch (e) {
-      setError('生成 Excel 文件失败: ' + (e instanceof Error ? e.message : String(e)));
+      setError(t('errorExcelFailed', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -543,28 +546,28 @@ export default function JsonToExcel() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">JSON 转 Excel</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">将 JSON 数据转换为 Excel 格式</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleFormat}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              格式化
+              {tc('common.format')}
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
             <button
               onClick={handleDownload}
               disabled={!content || !!error}
               className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              下载 Excel
+              {t('btnDownloadExcel')}
             </button>
           </div>
         </div>
@@ -580,7 +583,7 @@ export default function JsonToExcel() {
         {/* 输入区域 */}
         <div className="flex flex-col space-y-4">
           <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Input JSON
+            {t('labelInputJson')}
           </label>
           <div className="relative min-h-[300px]">
             {/* 语法高亮层 */}
@@ -594,7 +597,7 @@ export default function JsonToExcel() {
                 <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
                   <div className="text-center">
                     <div className="text-4xl mb-2">📊</div>
-                    <div className="text-lg font-medium">在此粘贴或输入 JSON...</div>
+                    <div className="text-lg font-medium">{t('emptyHint')}</div>
                   </div>
                 </div>
               )}
@@ -644,7 +647,7 @@ export default function JsonToExcel() {
           return (
             <div className="flex flex-col space-y-4">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Excel 预览 ({preview.data.length} 行数据)
+                {t('labelPreview', { count: preview.data.length })}
               </label>
               <div className="border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 overflow-auto">
                 <table className="min-w-full text-sm border-collapse">
@@ -708,12 +711,12 @@ export default function JsonToExcel() {
                 </table>
                 {preview.data.length > 10 && (
                   <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 text-center border-t border-gray-300 dark:border-gray-600">
-                    ... 还有 {preview.data.length - 10} 行数据未显示 ...
+                    {t('previewMoreRows', { count: preview.data.length - 10 })}
                   </div>
                 )}
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                * 预览中的合并单元格效果可能不完全准确，下载的 Excel 文件会正确显示合并效果和垂直居中对齐
+                {t('previewNote')}
               </p>
             </div>
           );

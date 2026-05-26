@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 interface ContextMenuProps {
   x: number;
@@ -9,9 +10,11 @@ interface ContextMenuProps {
   onCopyKey: () => void;
   onCopyValue: () => void;
   hasKey: boolean;
+  copyKeyLabel: string;
+  copyValueLabel: string;
 }
 
-function ContextMenu({ x, y, onClose, onCopyKey, onCopyValue, hasKey }: ContextMenuProps) {
+function ContextMenu({ x, y, onClose, onCopyKey, onCopyValue, hasKey, copyKeyLabel, copyValueLabel }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,7 +55,7 @@ function ContextMenu({ x, y, onClose, onCopyKey, onCopyValue, hasKey }: ContextM
           className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
         >
           <span>📋</span>
-          <span>复制 Key</span>
+          <span>{copyKeyLabel}</span>
         </button>
       )}
       <button
@@ -63,7 +66,7 @@ function ContextMenu({ x, y, onClose, onCopyKey, onCopyValue, hasKey }: ContextM
         className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
       >
         <span>📋</span>
-        <span>复制 Value</span>
+        <span>{copyValueLabel}</span>
       </button>
     </div>
   );
@@ -75,9 +78,13 @@ interface TreeNodeProps {
   level?: number;
   isLast?: boolean;
   path?: string;
+  treeItemLabel: string;
+  treeItemsLabel: string;
+  copyKeyLabel: string;
+  copyValueLabel: string;
 }
 
-function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeNodeProps) {
+function TreeNode({ data, keyName, level = 0, isLast = false, path = '', treeItemLabel, treeItemsLabel, copyKeyLabel, copyValueLabel }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(level < 2); // 默认展开前两层
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -185,7 +192,7 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
                 {type === 'array' ? '[' : '{'}
               </span>
               <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                {itemCount} {itemCount === 1 ? treeItemLabel : treeItemsLabel}
               </span>
               <span className="text-gray-500 dark:text-gray-400">
                 {type === 'array' ? ']' : '}'}
@@ -220,6 +227,10 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
                     level={level + 1}
                     isLast={index === data.length - 1}
                     path={currentPath}
+                    treeItemLabel={treeItemLabel}
+                    treeItemsLabel={treeItemsLabel}
+                    copyKeyLabel={copyKeyLabel}
+                    copyValueLabel={copyValueLabel}
                   />
                 </div>
               ))
@@ -239,6 +250,10 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
                     level={level + 1}
                     isLast={index === arr.length - 1}
                     path={currentPath}
+                    treeItemLabel={treeItemLabel}
+                    treeItemsLabel={treeItemsLabel}
+                    copyKeyLabel={copyKeyLabel}
+                    copyValueLabel={copyValueLabel}
                   />
                 </div>
               ))
@@ -256,6 +271,8 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
           onCopyKey={handleCopyKey}
           onCopyValue={handleCopyValue}
           hasKey={keyName !== undefined}
+          copyKeyLabel={copyKeyLabel}
+          copyValueLabel={copyValueLabel}
         />
       )}
     </>
@@ -263,6 +280,8 @@ function TreeNode({ data, keyName, level = 0, isLast = false, path = '' }: TreeN
 }
 
 export default function JsonView() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('json-view');
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [parsedData, setParsedData] = useState<any>(null);
@@ -280,10 +299,10 @@ export default function JsonView() {
       const parsed = JSON.parse(input);
       setParsedData(parsed);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
       setParsedData(null);
     }
-  }, [input]);
+  }, [input, tc]);
 
   const handleFormat = () => {
     if (!input.trim()) return;
@@ -293,7 +312,7 @@ export default function JsonView() {
       const formatted = JSON.stringify(parsed, null, 2);
       setInput(formatted);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -308,21 +327,21 @@ export default function JsonView() {
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">JSON 查看</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">可视化 JSON 数据结构</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleFormat}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              格式化
+              {tc('common.format')}
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -333,14 +352,14 @@ export default function JsonView() {
           {/* 左侧输入框 */}
           <div className="flex flex-col space-y-4 min-h-0">
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Input JSON
+              {t('labelInputJson')}
             </label>
             <div className="flex-1 relative min-h-0">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 className="w-full h-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="在此粘贴或输入 JSON..."
+                placeholder={t('placeholderInput')}
               />
               {error && (
                 <div className="absolute bottom-4 left-4 right-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
@@ -354,20 +373,26 @@ export default function JsonView() {
           {/* 右侧树形展示 */}
           <div className="flex flex-col space-y-4 min-h-0">
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Tree View
+              {t('labelTreeView')}
             </label>
             <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-y-auto overflow-x-auto p-4 min-h-0">
               {parsedData ? (
                 <div className="font-mono text-sm">
-                  <TreeNode data={parsedData} />
+                  <TreeNode
+                    data={parsedData}
+                    treeItemLabel={t('treeItem')}
+                    treeItemsLabel={t('treeItems')}
+                    copyKeyLabel={t('copyKey')}
+                    copyValueLabel={t('copyValue')}
+                  />
                 </div>
               ) : (
                 <div className="text-gray-400 dark:text-gray-500 text-sm flex items-center justify-center h-full min-h-[200px]">
                   <div className="text-center">
                     <div className="text-4xl mb-2">🌳</div>
-                    <div>输入 JSON 后，树形结构将显示在这里</div>
+                    <div>{t('emptyTreeHint')}</div>
                     <div className="text-xs mt-2 text-gray-400 dark:text-gray-500">
-                      支持展开/折叠节点，右键点击节点可复制
+                      {t('emptyTreeHintSub')}
                     </div>
                   </div>
                 </div>

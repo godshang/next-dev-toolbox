@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 function decodeBase64Url(str: string): string {
   const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -34,13 +35,15 @@ interface ClaimInfo {
   warn?: boolean;
 }
 
-function parseJwt(token: string): { data: ParsedJwt | null; error: string } {
+type ToolTranslate = (key: string) => string;
+
+function parseJwt(token: string, tp: ToolTranslate): { data: ParsedJwt | null; error: string } {
   if (!token.trim()) return { data: null, error: '' };
 
   try {
     const parts = token.trim().split('.');
     if (parts.length !== 3) {
-      throw new Error('JWT 必须包含 Header.Payload.Signature 三段');
+      throw new Error(tp('errorInvalidStructure'));
     }
 
     const [headerRaw, payloadRaw, signature] = parts;
@@ -58,19 +61,19 @@ function parseJwt(token: string): { data: ParsedJwt | null; error: string } {
       claims.push({
         key: 'exp',
         value: formatTimestamp(payload.exp),
-        note: expired ? '已过期' : '未过期',
+        note: expired ? tp('claimExpired') : tp('claimNotExpired'),
         warn: expired,
       });
     }
     if (payload.iat != null) {
-      claims.push({ key: 'iat', value: formatTimestamp(payload.iat), note: '签发时间' });
+      claims.push({ key: 'iat', value: formatTimestamp(payload.iat), note: tp('claimIssuedAt') });
     }
     if (payload.nbf != null) {
       const notYet = payload.nbf > now;
       claims.push({
         key: 'nbf',
         value: formatTimestamp(payload.nbf),
-        note: notYet ? '尚未生效' : '已生效',
+        note: notYet ? tp('claimNotYetValid') : tp('claimValid'),
         warn: notYet,
       });
     }
@@ -85,7 +88,12 @@ function parseJwt(token: string): { data: ParsedJwt | null; error: string } {
       error: '',
     };
   } catch (e) {
-    return { data: null, error: e instanceof Error ? e.message : 'JWT 解析失败' };
+    const msg = e instanceof Error ? e.message : '';
+    const knownErrors = [tp('errorInvalidStructure')];
+    return {
+      data: null,
+      error: knownErrors.includes(msg) ? msg : tp('errorParseFailed'),
+    };
   }
 }
 
@@ -97,9 +105,11 @@ interface ParsedJwt {
 }
 
 export default function JwtDecode() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('jwt-decode');
   const [token, setToken] = useState('');
 
-  const { data: parsed, error } = useMemo(() => parseJwt(token), [token]);
+  const { data: parsed, error } = useMemo(() => parseJwt(token, t), [token, t]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -108,24 +118,22 @@ export default function JwtDecode() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">JWT 解析</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          解码 JWT Token 的 Header 和 Payload（仅本地解析，不上传）
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       <div className="p-8 space-y-6">
         <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
-          🔒 数据仅在浏览器本地解析，不会上传到服务器
+          {t('privacyNote')}
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">JWT Token</label>
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelToken')}</label>
           <textarea
             value={token}
             onChange={e => setToken(e.target.value)}
             className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="粘贴 JWT Token（eyJhbGciOiJIUzI1NiIs...）"
+            placeholder={t('placeholderToken')}
           />
         </div>
 
@@ -139,7 +147,7 @@ export default function JwtDecode() {
           <>
             {parsed.claims.length > 0 && (
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">时间声明</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelTimeClaims')}</label>
                 <div className="flex flex-wrap gap-2">
                   {parsed.claims.map(claim => (
                     <div
@@ -172,7 +180,7 @@ export default function JwtDecode() {
                       onClick={() => copyToClipboard(block.content)}
                       className="text-xs px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                     >
-                      复制
+                      {tc('common.copy')}
                     </button>
                   </div>
                   <pre className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 font-mono text-sm text-gray-800 dark:text-gray-200 overflow-auto max-h-80 whitespace-pre-wrap">
@@ -183,7 +191,7 @@ export default function JwtDecode() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Signature</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelSignature')}</label>
               <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 font-mono text-sm break-all text-gray-600 dark:text-gray-400">
                 {parsed.signature}
               </div>

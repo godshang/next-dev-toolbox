@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // RGB 颜色结构
 interface RGB {
@@ -290,6 +291,8 @@ function parseInput(input: string, format: string): RGB | null {
 }
 
 export default function ColorConverter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('color-converter');
   const [hex, setHex] = useState('');
   const [rgb, setRgb] = useState('');
   const [cmyk, setCmyk] = useState('');
@@ -330,7 +333,7 @@ export default function ColorConverter() {
     if (rgbColor) {
       updateAllFormats(rgbColor);
     } else if (value.trim()) {
-      setError('无效的 HEX 颜色格式');
+      setError(t('errorInvalidHex'));
     }
   };
 
@@ -341,7 +344,7 @@ export default function ColorConverter() {
     if (rgbColor) {
       updateAllFormats(rgbColor);
     } else if (value.trim()) {
-      setError('无效的 RGB 颜色格式');
+      setError(t('errorInvalidRgb'));
     }
   };
 
@@ -352,7 +355,7 @@ export default function ColorConverter() {
     if (rgbColor) {
       updateAllFormats(rgbColor);
     } else if (value.trim()) {
-      setError('无效的 CMYK 颜色格式');
+      setError(t('errorInvalidCmyk'));
     }
   };
 
@@ -363,7 +366,7 @@ export default function ColorConverter() {
     if (rgbColor) {
       updateAllFormats(rgbColor);
     } else if (value.trim()) {
-      setError('无效的 HSL 颜色格式');
+      setError(t('errorInvalidHsl'));
     }
   };
 
@@ -374,7 +377,7 @@ export default function ColorConverter() {
     if (rgbColor) {
       updateAllFormats(rgbColor);
     } else if (value.trim()) {
-      setError('无效的 HSB/HSV 颜色格式');
+      setError(t('errorInvalidHsb'));
     }
   };
 
@@ -405,15 +408,15 @@ export default function ColorConverter() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">颜色格式转换</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">RGB、HEX、CMYK、HSL、HSB/HSV 格式互相转换</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -434,7 +437,7 @@ export default function ColorConverter() {
               style={{ backgroundColor: colorPreview }}
             />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">颜色预览</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('previewTitle')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">{colorPreview}</p>
             </div>
           </div>
@@ -453,7 +456,7 @@ export default function ColorConverter() {
                   onClick={() => handleCopy(hex)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -461,7 +464,7 @@ export default function ColorConverter() {
               type="text"
               value={hex}
               onChange={(e) => handleHexChange(e.target.value)}
-              placeholder="#3498DB"
+              placeholder={t('placeholderHex')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
             />
           </div>
@@ -477,7 +480,7 @@ export default function ColorConverter() {
                   onClick={() => handleCopy(rgb)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -485,7 +488,7 @@ export default function ColorConverter() {
               type="text"
               value={rgb}
               onChange={(e) => handleRgbChange(e.target.value)}
-              placeholder="rgb(52, 152, 219)"
+              placeholder={t('placeholderRgb')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
             />
           </div>
@@ -501,7 +504,7 @@ export default function ColorConverter() {
                   onClick={() => handleCopy(cmyk)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -509,7 +512,7 @@ export default function ColorConverter() {
               type="text"
               value={cmyk}
               onChange={(e) => handleCmykChange(e.target.value)}
-              placeholder="cmyk(76, 31, 0, 14)"
+              placeholder={t('placeholderCmyk')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
             />
           </div>
@@ -525,7 +528,7 @@ export default function ColorConverter() {
                   onClick={() => handleCopy(hsl)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -533,7 +536,7 @@ export default function ColorConverter() {
               type="text"
               value={hsl}
               onChange={(e) => handleHslChange(e.target.value)}
-              placeholder="hsl(204, 70%, 53%)"
+              placeholder={t('placeholderHsl')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
             />
           </div>
@@ -549,7 +552,7 @@ export default function ColorConverter() {
                   onClick={() => handleCopy(hsb)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -557,7 +560,7 @@ export default function ColorConverter() {
               type="text"
               value={hsb}
               onChange={(e) => handleHsbChange(e.target.value)}
-              placeholder="hsb(204, 76%, 86%)"
+              placeholder={t('placeholderHsb')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
             />
           </div>
@@ -567,28 +570,28 @@ export default function ColorConverter() {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
             <span className="text-blue-500">ℹ️</span>
-            格式说明
+            {t('formatHelpTitle')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
             <div>
               <p className="font-semibold mb-2">HEX:</p>
-              <p className="font-mono text-xs">#RRGGBB 或 #RGB</p>
+              <p className="font-mono text-xs">{t('fmtHex')}</p>
             </div>
             <div>
               <p className="font-semibold mb-2">RGB:</p>
-              <p className="font-mono text-xs">rgb(r, g, b) 范围: 0-255</p>
+              <p className="font-mono text-xs">{t('fmtRgb')}</p>
             </div>
             <div>
               <p className="font-semibold mb-2">CMYK:</p>
-              <p className="font-mono text-xs">cmyk(c, m, y, k) 范围: 0-100</p>
+              <p className="font-mono text-xs">{t('fmtCmyk')}</p>
             </div>
             <div>
               <p className="font-semibold mb-2">HSL:</p>
-              <p className="font-mono text-xs">hsl(h, s%, l%) h: 0-360, s/l: 0-100</p>
+              <p className="font-mono text-xs">{t('fmtHsl')}</p>
             </div>
             <div className="md:col-span-2">
               <p className="font-semibold mb-2">HSB/HSV:</p>
-              <p className="font-mono text-xs">hsb(h, s%, b%) 或 hsv(h, s%, v%) h: 0-360, s/b: 0-100</p>
+              <p className="font-mono text-xs">{t('fmtHsb')}</p>
             </div>
           </div>
         </div>

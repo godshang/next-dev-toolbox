@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 interface UrlParams {
   [key: string]: string;
@@ -16,6 +17,8 @@ interface ComparisonResult {
 type TabType = 'same' | 'different' | 'onlyInUrl1' | 'onlyInUrl2';
 
 export default function UrlCompare() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('url-compare');
   const [url1, setUrl1] = useState('');
   const [url2, setUrl2] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('same');
@@ -99,11 +102,10 @@ export default function UrlCompare() {
     comparisonResult.onlyInUrl1.length > 0 ||
     comparisonResult.onlyInUrl2.length > 0;
 
-  // 定义TAB配置
   const tabs = [
     {
       id: 'same' as TabType,
-      label: '相同的参数',
+      label: t('tabSame'),
       icon: '✅',
       count: comparisonResult.same.length,
       color: 'green',
@@ -111,7 +113,7 @@ export default function UrlCompare() {
     },
     {
       id: 'different' as TabType,
-      label: '参数值不同',
+      label: t('tabDifferent'),
       icon: '⚠️',
       count: comparisonResult.different.length,
       color: 'yellow',
@@ -119,7 +121,7 @@ export default function UrlCompare() {
     },
     {
       id: 'onlyInUrl1' as TabType,
-      label: '仅在 URL 1 中',
+      label: t('tabOnlyUrl1'),
       icon: '🔴',
       count: comparisonResult.onlyInUrl1.length,
       color: 'red',
@@ -127,7 +129,7 @@ export default function UrlCompare() {
     },
     {
       id: 'onlyInUrl2' as TabType,
-      label: '仅在 URL 2 中',
+      label: t('tabOnlyUrl2'),
       icon: '🔵',
       count: comparisonResult.onlyInUrl2.length,
       color: 'blue',
@@ -176,8 +178,8 @@ export default function UrlCompare() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">URL 参数比较</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">比较两个URL的参数差异</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{tool?.description}</p>
       </div>
       
       <div className="p-8 space-y-6">
@@ -185,24 +187,24 @@ export default function UrlCompare() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              URL 1
+              {t('labelUrl1')}
             </label>
             <textarea
               value={url1}
               onChange={(e) => setUrl1(e.target.value)}
               className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="输入第一个URL，例如：https://example.com?param1=value1&param2=value2"
+              placeholder={t('placeholderUrl1')}
             />
           </div>
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              URL 2
+              {t('labelUrl2')}
             </label>
             <textarea
               value={url2}
               onChange={(e) => setUrl2(e.target.value)}
               className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="输入第二个URL，例如：https://example.com?param1=value1&param3=value3"
+              placeholder={t('placeholderUrl2')}
             />
           </div>
         </div>
@@ -262,7 +264,7 @@ export default function UrlCompare() {
                             {item.key}
                           </span>
                           <span className="text-gray-500 dark:text-gray-400 mx-2 whitespace-nowrap">=</span>
-                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || '(空值)'}</span>
+                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || tc('common.emptyValue')}</span>
                         </div>
                       </div>
                     </div>
@@ -284,16 +286,16 @@ export default function UrlCompare() {
                         </div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                           <div className="flex-1 w-full sm:w-auto bg-red-50 dark:bg-red-900/20 rounded p-2 border border-red-200 dark:border-red-800 min-w-0">
-                            <span className="text-xs text-red-600 dark:text-red-400 font-medium block mb-1">URL 1:</span>
+                            <span className="text-xs text-red-600 dark:text-red-400 font-medium block mb-1">{t('labelUrl1Value')}</span>
                             <div className="text-gray-700 dark:text-gray-300 overflow-x-auto">
-                              <span className="whitespace-nowrap">{item.value1 || '(空值)'}</span>
+                              <span className="whitespace-nowrap">{item.value1 || tc('common.emptyValue')}</span>
                             </div>
                           </div>
                           <span className="text-gray-400 self-center">→</span>
                           <div className="flex-1 w-full sm:w-auto bg-blue-50 dark:bg-blue-900/20 rounded p-2 border border-blue-200 dark:border-blue-800 min-w-0">
-                            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium block mb-1">URL 2:</span>
+                            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium block mb-1">{t('labelUrl2Value')}</span>
                             <div className="text-gray-700 dark:text-gray-300 overflow-x-auto">
-                              <span className="whitespace-nowrap">{item.value2 || '(空值)'}</span>
+                              <span className="whitespace-nowrap">{item.value2 || tc('common.emptyValue')}</span>
                             </div>
                           </div>
                         </div>
@@ -317,7 +319,7 @@ export default function UrlCompare() {
                             {item.key}
                           </span>
                           <span className="text-gray-500 dark:text-gray-400 mx-2 whitespace-nowrap">=</span>
-                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || '(空值)'}</span>
+                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || tc('common.emptyValue')}</span>
                         </div>
                       </div>
                     </div>
@@ -339,7 +341,7 @@ export default function UrlCompare() {
                             {item.key}
                           </span>
                           <span className="text-gray-500 dark:text-gray-400 mx-2 whitespace-nowrap">=</span>
-                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || '(空值)'}</span>
+                          <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.value || tc('common.emptyValue')}</span>
                         </div>
                       </div>
                     </div>
@@ -354,7 +356,7 @@ export default function UrlCompare() {
                 (activeTab === 'onlyInUrl2' && comparisonResult.onlyInUrl2.length === 0)) && (
                 <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                   <div className="text-4xl mb-4">📭</div>
-                  <p>当前分类没有数据</p>
+                  <p>{t('emptyTab')}</p>
                 </div>
               )}
             </div>
@@ -365,14 +367,14 @@ export default function UrlCompare() {
         {!hasResults && url1.trim() && url2.trim() && (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <div className="text-4xl mb-4">🔍</div>
-            <p>两个URL都没有参数，或无法解析参数</p>
+            <p>{t('emptyNoParams')}</p>
           </div>
         )}
 
         {!url1.trim() || !url2.trim() ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <div className="text-4xl mb-4">📝</div>
-            <p>请输入两个URL进行比较</p>
+            <p>{t('emptyEnterUrls')}</p>
           </div>
         ) : null}
       </div>

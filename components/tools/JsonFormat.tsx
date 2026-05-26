@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // JSON 语法高亮函数
 const highlightJSON = (text: string): string => {
@@ -113,6 +114,8 @@ const escapeHtml = (text: string): string => {
 };
 
 export default function JsonFormat() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('json-format');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -146,7 +149,7 @@ export default function JsonFormat() {
       const formatted = JSON.stringify(parsed, null, 2);
       setContent(formatted);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -157,7 +160,7 @@ export default function JsonFormat() {
       const minified = JSON.stringify(parsed);
       setContent(minified);
     } catch (e) {
-      setError('Invalid JSON format');
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -180,8 +183,8 @@ export default function JsonFormat() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">JSON 格式化</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">格式化、压缩和美化 JSON 数据</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -189,27 +192,27 @@ export default function JsonFormat() {
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               <span className="flex items-center gap-2">
-                <span>格式化</span>
+                <span>{tc('common.format')}</span>
               </span>
             </button>
             <button
               onClick={handleMinify}
               className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              压缩
+              {tc('common.minify')}
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
             <button
               onClick={handleCopy}
               disabled={!content}
               className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              复制
+              {tc('common.copy')}
             </button>
           </div>
         </div>
@@ -248,8 +251,8 @@ export default function JsonFormat() {
               <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
                 <div className="text-center">
                   <div className="text-4xl mb-2">📝</div>
-                  <div className="text-lg font-medium">在此粘贴或输入 JSON...</div>
-                  <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">支持实时语法高亮</div>
+                  <div className="text-lg font-medium">{t('emptyHint')}</div>
+                  <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">{t('emptyHintSub')}</div>
                 </div>
               </div>
             )}

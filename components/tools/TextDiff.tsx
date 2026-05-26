@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { diffLines } from 'diff';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 type LineDiff = {
   type: 'added' | 'removed' | 'unchanged';
@@ -27,6 +28,7 @@ function computeLineDiff(left: string, right: string): LineDiff[] {
 }
 
 export default function TextDiff() {
+  const { t, tool } = useToolPage('text-diff');
   const [left, setLeft] = useState('');
   const [right, setRight] = useState('');
 
@@ -63,45 +65,45 @@ export default function TextDiff() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">文本 Diff</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">行级对比两段文本的差异</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{tool?.description}</p>
       </div>
 
       <div className="p-8 space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">原文本</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelOriginal')}</label>
             <textarea
               value={left}
               onChange={e => setLeft(e.target.value)}
               className="w-full h-48 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="粘贴或输入原文本..."
+              placeholder={t('placeholderOriginal')}
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">新文本</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelNew')}</label>
             <textarea
               value={right}
               onChange={e => setRight(e.target.value)}
               className="w-full h-48 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="粘贴或输入新文本..."
+              placeholder={t('placeholderNew')}
             />
           </div>
         </div>
 
         {(left || right) && (
           <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <span className="text-green-600 dark:text-green-400">+{stats.added} 新增</span>
-            <span className="text-red-600 dark:text-red-400">-{stats.removed} 删除</span>
+            <span className="text-green-600 dark:text-green-400">{t('statsAdded', { count: stats.added })}</span>
+            <span className="text-red-600 dark:text-red-400">{t('statsRemoved', { count: stats.removed })}</span>
           </div>
         )}
 
         {(left || right) && (
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">对比结果</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelResult')}</label>
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden max-h-96 overflow-y-auto">
               {diffs.length === 0 ? (
-                <div className="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">无差异</div>
+                <div className="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">{t('noDiff')}</div>
               ) : (
                 <pre className="font-mono text-sm">
                   {diffs.map((line, i) => (

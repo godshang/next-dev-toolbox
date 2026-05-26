@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 export default function UnicodeCodec() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('unicode-codec');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [mode, setMode] = useState<'encode' | 'decode'>('encode');
@@ -196,22 +199,22 @@ export default function UnicodeCodec() {
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Unicode 编解码</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Unicode 编码与解码工具</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={clearAll}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
             <button
               onClick={copyToClipboard}
               disabled={!output}
               className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              复制结果
+              {t('btnCopyResult')}
             </button>
           </div>
         </div>
@@ -219,7 +222,7 @@ export default function UnicodeCodec() {
         {/* 模式切换 */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700 dark:text-gray-300">模式:</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('labelMode')}</span>
             <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
               <button
                 onClick={() => handleModeChange('encode')}
@@ -229,7 +232,7 @@ export default function UnicodeCodec() {
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
-                编码
+                {tc('common.encode')}
               </button>
               <button
                 onClick={() => handleModeChange('decode')}
@@ -239,13 +242,13 @@ export default function UnicodeCodec() {
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
-                解码
+                {tc('common.decode')}
               </button>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700 dark:text-gray-300">格式:</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('labelFormat')}</span>
             <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
               <button
                 onClick={() => handleFormatChange('escape')}
@@ -275,7 +278,7 @@ export default function UnicodeCodec() {
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
-                十进制
+                {t('formatDecimal')}
               </button>
             </div>
           </div>
@@ -286,7 +289,7 @@ export default function UnicodeCodec() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {mode === 'encode' ? '输入文本' : '输入 Unicode 编码'}
+              {mode === 'encode' ? t('labelInputEncode') : t('labelInputDecode')}
             </label>
             <textarea
               value={input}
@@ -294,35 +297,35 @@ export default function UnicodeCodec() {
               className="w-full h-64 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               placeholder={
                 mode === 'encode'
-                  ? '输入要编码的文本...'
+                  ? t('placeholderEncode')
                   : format === 'escape'
-                  ? '输入 \\uXXXX 格式的 Unicode 编码...'
+                  ? t('placeholderDecodeEscape')
                   : format === 'unicode'
-                  ? '输入 U+XXXX 格式的 Unicode 编码...'
-                  : '输入十进制 Unicode 编码...'
+                  ? t('placeholderDecodeUnicode')
+                  : t('placeholderDecodeDecimal')
               }
             />
           </div>
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {mode === 'encode' ? 'Unicode 编码结果' : '解码文本'}
+              {mode === 'encode' ? t('labelOutputEncode') : t('labelOutputDecode')}
             </label>
             <textarea
               value={output}
               readOnly
               className="w-full h-64 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none"
-              placeholder="结果将显示在这里..."
+              placeholder={t('placeholderResult')}
             />
           </div>
         </div>
 
         {/* 示例说明 */}
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">格式说明：</h3>
+          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">{t('formatHelpTitle')}</h3>
           <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-            <li><strong>\uXXXX</strong>: JavaScript 转义序列格式，例如 <code className="bg-blue-100 dark:bg-blue-900/50 px-1 rounded">\u0041</code> 表示字符 'A'</li>
-            <li><strong>U+XXXX</strong>: Unicode 标准格式，例如 <code className="bg-blue-100 dark:bg-blue-900/50 px-1 rounded">U+0041</code> 表示字符 'A'</li>
-            <li><strong>十进制</strong>: Unicode 码点的十进制表示，例如 <code className="bg-blue-100 dark:bg-blue-900/50 px-1 rounded">65</code> 表示字符 'A'</li>
+            <li><strong>\uXXXX</strong>: {t('formatHelpEscape')}</li>
+            <li><strong>U+XXXX</strong>: {t('formatHelpUnicode')}</li>
+            <li><strong>{t('formatDecimal')}</strong>: {t('formatHelpDecimal')}</li>
           </ul>
         </div>
       </div>

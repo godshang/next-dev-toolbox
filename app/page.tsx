@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { tools } from '@/lib/tools-registry';
+import { I18nProvider, useI18n } from '@/lib/i18n';
 import { addRecentTool } from '@/lib/tools-storage';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
@@ -174,18 +175,23 @@ function HomeContent() {
   );
 }
 
+function LoadingFallback() {
+  const { t } = useI18n();
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500 dark:text-gray-400">{t('common.loading')}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-          <div className="flex items-center justify-center h-screen">
-            <div className="text-gray-500 dark:text-gray-400">加载中...</div>
-          </div>
-        </div>
-      }
-    >
-      <HomeContent />
-    </Suspense>
+    <I18nProvider>
+      <Suspense fallback={<LoadingFallback />}>
+        <HomeContent />
+      </Suspense>
+    </I18nProvider>
   );
 }

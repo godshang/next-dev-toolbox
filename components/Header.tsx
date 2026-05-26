@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
+import LocaleSwitcher from '@/components/LocaleSwitcher';
 
 interface HeaderProps {
   onSearchOpen: () => void;
@@ -9,6 +11,7 @@ interface HeaderProps {
 
 export default function Header({ onSearchOpen, onMenuToggle }: HeaderProps) {
   const router = useRouter();
+  const { t } = useI18n();
 
   return (
     <header className="sticky top-0 z-40 h-14 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm">
@@ -17,7 +20,7 @@ export default function Header({ onSearchOpen, onMenuToggle }: HeaderProps) {
           type="button"
           onClick={onMenuToggle}
           className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label="打开菜单"
+          aria-label={t('common.openMenu')}
         >
           ☰
         </button>
@@ -35,13 +38,15 @@ export default function Header({ onSearchOpen, onMenuToggle }: HeaderProps) {
 
         <div className="flex-1" />
 
+        <LocaleSwitcher />
+
         <button
           type="button"
           onClick={onSearchOpen}
           className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         >
           <span>🔍</span>
-          <span className="hidden sm:inline">搜索工具</span>
+          <span className="hidden sm:inline">{t('common.searchToolsShort')}</span>
           <kbd className="hidden md:inline text-xs bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-600">
             Ctrl+K
           </kbd>

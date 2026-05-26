@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 export default function UuidGenerator() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('uuid');
   const [count, setCount] = useState(1);
   const [removeHyphens, setRemoveHyphens] = useState(false);
   const [uppercase, setUppercase] = useState(false);
@@ -35,15 +38,15 @@ export default function UuidGenerator() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">UUID 生成器</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">生成唯一标识符 (UUID v4)</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
       
       <div className="p-8 space-y-6">
         <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center gap-4 flex-wrap">
             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Count:
+              {t('labelCount')}
             </label>
             <input
               type="number"
@@ -57,14 +60,14 @@ export default function UuidGenerator() {
               onClick={handleGenerate}
               className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              Generate
+              {tc('common.generate')}
             </button>
             {uuids.length > 0 && (
               <button
                 onClick={copyAll}
                 className="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
-                Copy All
+                {tc('common.copyAll')}
               </button>
             )}
           </div>
@@ -76,17 +79,17 @@ export default function UuidGenerator() {
                 onChange={(e) => setRemoveHyphens(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              删除短横线
+              {t('removeHyphens')}
             </label>
             <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <span className="font-semibold">大小写:</span>
+              <span className="font-semibold">{t('labelCase')}</span>
               <select
                 value={uppercase ? 'uppercase' : 'lowercase'}
                 onChange={(e) => setUppercase(e.target.value === 'uppercase')}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
-                <option value="uppercase">大写</option>
-                <option value="lowercase">小写</option>
+                <option value="uppercase">{t('caseUpper')}</option>
+                <option value="lowercase">{t('caseLower')}</option>
               </select>
             </div>
           </div>
@@ -96,7 +99,7 @@ export default function UuidGenerator() {
           <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
               <span className="text-purple-500">🔑</span>
-              Generated UUIDs ({uuids.length})
+              {t('resultTitle', { count: uuids.length })}
             </h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {uuids.map((uuid, index) => (
@@ -109,7 +112,7 @@ export default function UuidGenerator() {
                     onClick={() => copyToClipboard(uuid)}
                     className="px-4 py-1.5 text-xs bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:from-gray-300 hover:to-gray-400 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all duration-200 font-medium"
                   >
-                    Copy
+                    {tc('common.copy')}
                   </button>
                 </div>
               ))}

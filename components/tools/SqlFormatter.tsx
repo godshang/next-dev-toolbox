@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { format } from 'sql-formatter';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // SQL 语法高亮函数
 const highlightSQL = (text: string, uppercase: boolean = true): string => {
@@ -115,6 +116,8 @@ const escapeHtml = (text: string): string => {
 };
 
 export default function SqlFormatter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('sql-formatter');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [uppercase, setUppercase] = useState(true);
@@ -139,7 +142,7 @@ export default function SqlFormatter() {
 
   const handleFormat = () => {
     if (!content.trim()) {
-      setError('请输入要格式化的 SQL 语句');
+      setError(t('errorEmpty'));
       return;
     }
 
@@ -153,7 +156,7 @@ export default function SqlFormatter() {
       } as any);
       setContent(formatted);
     } catch (e: any) {
-      setError(e.message || 'SQL 格式化失败，请检查 SQL 语法');
+      setError(e.message || t('errorFormatFailed'));
     }
   };
 
@@ -182,36 +185,36 @@ export default function SqlFormatter() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">SQL 格式化</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">格式化、美化和优化 SQL 语句</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleExample}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              示例
+              {t('btnExample')}
             </button>
             <button
               onClick={handleFormat}
               className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               <span className="flex items-center gap-2">
-                <span>格式化</span>
+                <span>{tc('common.format')}</span>
               </span>
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
             <button
               onClick={handleCopy}
               disabled={!content}
               className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              复制
+              {tc('common.copy')}
             </button>
           </div>
         </div>
@@ -226,7 +229,7 @@ export default function SqlFormatter() {
                 onChange={(e) => setUppercase(e.target.checked)}
                 className="mr-1"
               />
-              关键字大写
+              {t('optionUppercase')}
             </label>
           </div>
         </div>
@@ -252,8 +255,8 @@ export default function SqlFormatter() {
             <div className="text-gray-400 dark:text-gray-500 flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="text-4xl mb-2">🗄️</div>
-                <div className="text-lg font-medium">在此粘贴或输入 SQL 语句...</div>
-                <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">支持实时语法高亮</div>
+                <div className="text-lg font-medium">{t('emptyHint')}</div>
+                <div className="text-sm mt-1 text-gray-400 dark:text-gray-500">{t('emptyHintSub')}</div>
               </div>
             </div>
           )}

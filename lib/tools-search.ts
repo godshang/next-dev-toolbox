@@ -1,6 +1,6 @@
-import { tools, ToolItem } from './tools-registry';
+import type { LocalizedToolItem } from '@/lib/i18n/tools';
 
-export function searchTools(query: string): ToolItem[] {
+export function searchTools(query: string, tools: LocalizedToolItem[]): LocalizedToolItem[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
 

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import * as parser from 'cron-parser';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 type CronType = 'linux' | 'java' | 'quartz';
 
@@ -85,6 +86,8 @@ function parseCronExpression(expression: string, type: CronType): CronResult {
 }
 
 export default function CronExpressionGenerator() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('cron');
   const [cronExpression, setCronExpression] = useState('0 0 * * *');
   const [cronType, setCronType] = useState<CronType>('linux');
   const [result, setResult] = useState<CronResult | null>(null);
@@ -152,8 +155,8 @@ export default function CronExpressionGenerator() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">CRON 表达式解析</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">解析 CRON 表达式并显示最近 10 次执行时间</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -161,13 +164,13 @@ export default function CronExpressionGenerator() {
               disabled={!cronExpression.trim()}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              解析
+              {t('btnParse')}
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -179,7 +182,7 @@ export default function CronExpressionGenerator() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                CRON 表达式类型
+                {t('labelCronType')}
               </label>
               <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 gap-1">
                 <button
@@ -196,7 +199,7 @@ export default function CronExpressionGenerator() {
                       : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
                   }`}
                 >
-                  Linux Cron
+                  {t('typeLinux')}
                 </button>
                 <button
                   onClick={() => {
@@ -212,7 +215,7 @@ export default function CronExpressionGenerator() {
                       : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
                   }`}
                 >
-                  Java Cron
+                  {t('typeJava')}
                 </button>
                 <button
                   onClick={() => {
@@ -228,7 +231,7 @@ export default function CronExpressionGenerator() {
                       : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
                   }`}
                 >
-                  Quartz Cron
+                  {t('typeQuartz')}
                 </button>
               </div>
             </div>
@@ -236,14 +239,14 @@ export default function CronExpressionGenerator() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  CRON 表达式
+                  {t('labelExpression')}
                 </label>
                 {cronExpression && (
                   <button
                     onClick={() => handleCopy(cronExpression)}
                     className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                   >
-                    复制
+                    {tc('common.copy')}
                   </button>
                 )}
               </div>
@@ -258,7 +261,7 @@ export default function CronExpressionGenerator() {
             {/* 示例表达式 */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                示例表达式
+                {t('labelExamples')}
               </label>
               <div className="flex flex-wrap gap-2">
                 {examples[cronType].map((example, index) => (
@@ -286,7 +289,7 @@ export default function CronExpressionGenerator() {
               <div className="text-red-600 dark:text-red-400">
                 <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <span>❌</span>
-                  解析错误
+                  {t('errorTitle')}
                 </h3>
                 <p className="text-sm">{result.error}</p>
               </div>
@@ -294,7 +297,7 @@ export default function CronExpressionGenerator() {
               <>
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
                   <span className="text-blue-500">📅</span>
-                  最近 10 次执行时间
+                  {t('resultTitle')}
                 </h3>
                 <div className="space-y-2">
                   {result.nextTimes.length > 0 ? (
@@ -315,12 +318,12 @@ export default function CronExpressionGenerator() {
                           onClick={() => handleCopy(formatDateTime(date))}
                           className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                         >
-                          复制
+                          {tc('common.copy')}
                         </button>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">无法获取执行时间</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">{t('noTimes')}</p>
                   )}
                 </div>
               </>
@@ -332,91 +335,91 @@ export default function CronExpressionGenerator() {
         <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
             <span className="text-purple-500">📖</span>
-            CRON 表达式语法规则
+            {t('rulesTitle')}
           </h3>
           
           <div className="space-y-6">
             {/* Linux Cron */}
             <div>
-              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">Linux Cron (5 字段)</h4>
+              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">{t('linuxTitle')}</h4>
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg font-mono text-sm">
                 <div className="grid grid-cols-5 gap-2 mb-2 text-xs text-gray-600 dark:text-gray-400">
-                  <div className="text-center">分钟</div>
-                  <div className="text-center">小时</div>
-                  <div className="text-center">日</div>
-                  <div className="text-center">月</div>
-                  <div className="text-center">星期</div>
+                  <div className="text-center">{t('fieldMinute')}</div>
+                  <div className="text-center">{t('fieldHour')}</div>
+                  <div className="text-center">{t('fieldDay')}</div>
+                  <div className="text-center">{t('fieldMonth')}</div>
+                  <div className="text-center">{t('fieldWeek')}</div>
                 </div>
                 <div className="grid grid-cols-5 gap-2 text-gray-900 dark:text-white">
-                  <div className="text-center">0-59</div>
-                  <div className="text-center">0-23</div>
-                  <div className="text-center">1-31</div>
-                  <div className="text-center">1-12</div>
-                  <div className="text-center">0-7 (0和7都表示星期日)</div>
+                  <div className="text-center">{t('rangeMinute')}</div>
+                  <div className="text-center">{t('rangeHour')}</div>
+                  <div className="text-center">{t('rangeDay')}</div>
+                  <div className="text-center">{t('rangeMonth')}</div>
+                  <div className="text-center">{t('rangeWeek')}</div>
                 </div>
               </div>
               <ul className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
-                <li>特殊字符: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">*</code> (任意值), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">,</code> (列表), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">-</code> (范围), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/</code> (步长)</li>
-                <li>示例: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">0 0 * * *</code> (每天午夜)</li>
+                <li>{t('specialCharsLinux')}</li>
+                <li>{t('exampleDaily')}</li>
               </ul>
             </div>
 
             {/* Java Cron */}
             <div>
-              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">Java Cron (6 字段)</h4>
+              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">{t('javaTitle')}</h4>
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg font-mono text-sm">
                 <div className="grid grid-cols-6 gap-2 mb-2 text-xs text-gray-600 dark:text-gray-400">
-                  <div className="text-center">秒</div>
-                  <div className="text-center">分钟</div>
-                  <div className="text-center">小时</div>
-                  <div className="text-center">日</div>
-                  <div className="text-center">月</div>
-                  <div className="text-center">星期</div>
+                  <div className="text-center">{t('fieldSecond')}</div>
+                  <div className="text-center">{t('fieldMinute')}</div>
+                  <div className="text-center">{t('fieldHour')}</div>
+                  <div className="text-center">{t('fieldDay')}</div>
+                  <div className="text-center">{t('fieldMonth')}</div>
+                  <div className="text-center">{t('fieldWeek')}</div>
                 </div>
                 <div className="grid grid-cols-6 gap-2 text-gray-900 dark:text-white">
-                  <div className="text-center">0-59</div>
-                  <div className="text-center">0-59</div>
-                  <div className="text-center">0-23</div>
-                  <div className="text-center">1-31</div>
-                  <div className="text-center">1-12</div>
-                  <div className="text-center">0-7 (0和7都表示星期日)</div>
+                  <div className="text-center">{t('rangeSecond')}</div>
+                  <div className="text-center">{t('rangeMinute')}</div>
+                  <div className="text-center">{t('rangeHour')}</div>
+                  <div className="text-center">{t('rangeDay')}</div>
+                  <div className="text-center">{t('rangeMonth')}</div>
+                  <div className="text-center">{t('rangeWeek')}</div>
                 </div>
               </div>
               <ul className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
-                <li>特殊字符: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">*</code> (任意值), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">?</code> (不指定), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">,</code> (列表), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">-</code> (范围), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/</code> (步长)</li>
-                <li>星期可用: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">SUN, MON, TUE, WED, THU, FRI, SAT</code> 或 <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">0-7</code></li>
-                <li>示例: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">0 0 0 * * ?</code> (每天午夜)</li>
+                <li>{t('specialCharsJava')}</li>
+                <li>{t('weekNames')}</li>
+                <li>{t('exampleDailyJava')}</li>
               </ul>
             </div>
 
             {/* Quartz Cron */}
             <div>
-              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">Quartz Cron (6 或 7 字段)</h4>
+              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-2">{t('quartzTitle')}</h4>
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg font-mono text-sm">
                 <div className="grid grid-cols-7 gap-2 mb-2 text-xs text-gray-600 dark:text-gray-400">
-                  <div className="text-center">秒</div>
-                  <div className="text-center">分钟</div>
-                  <div className="text-center">小时</div>
-                  <div className="text-center">日</div>
-                  <div className="text-center">月</div>
-                  <div className="text-center">星期</div>
-                  <div className="text-center">年</div>
+                  <div className="text-center">{t('fieldSecond')}</div>
+                  <div className="text-center">{t('fieldMinute')}</div>
+                  <div className="text-center">{t('fieldHour')}</div>
+                  <div className="text-center">{t('fieldDay')}</div>
+                  <div className="text-center">{t('fieldMonth')}</div>
+                  <div className="text-center">{t('fieldWeek')}</div>
+                  <div className="text-center">{t('fieldYear')}</div>
                 </div>
                 <div className="grid grid-cols-7 gap-2 text-gray-900 dark:text-white">
-                  <div className="text-center">0-59</div>
-                  <div className="text-center">0-59</div>
-                  <div className="text-center">0-23</div>
-                  <div className="text-center">1-31</div>
-                  <div className="text-center">1-12</div>
+                  <div className="text-center">{t('rangeSecond')}</div>
+                  <div className="text-center">{t('rangeMinute')}</div>
+                  <div className="text-center">{t('rangeHour')}</div>
+                  <div className="text-center">{t('rangeDay')}</div>
+                  <div className="text-center">{t('rangeMonth')}</div>
                   <div className="text-center">0-7</div>
-                  <div className="text-center">1970-2099 (可选)</div>
+                  <div className="text-center">{t('rangeYear')}</div>
                 </div>
               </div>
               <ul className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
-                <li>特殊字符: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">*</code> (任意值), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">?</code> (不指定), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">,</code> (列表), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">-</code> (范围), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/</code> (步长), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">L</code> (最后), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">W</code> (工作日), <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">#</code> (第N个星期X)</li>
-                <li>星期可用: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">SUN, MON, TUE, WED, THU, FRI, SAT</code> 或 <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">0-7</code></li>
-                <li>示例: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">0 0 9 ? * MON-FRI</code> (工作日上午9点)</li>
-                <li className="text-yellow-600 dark:text-yellow-400">注意: 年份字段暂不支持，7字段表达式会自动忽略年份</li>
+                <li>{t('specialCharsQuartz')}</li>
+                <li>{t('weekNames')}</li>
+                <li>{t('exampleWeekday')}</li>
+                <li className="text-yellow-600 dark:text-yellow-400">{t('yearNote')}</li>
               </ul>
             </div>
           </div>

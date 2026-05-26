@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -19,6 +20,8 @@ const builder = new XMLBuilder({
 });
 
 export default function XmlJsonConverter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('xml-json');
   const [jsonContent, setJsonContent] = useState('');
   const [xmlContent, setXmlContent] = useState('');
   const [error, setError] = useState('');
@@ -41,9 +44,9 @@ export default function XmlJsonConverter() {
       setError('');
       isUpdatingRef.current = false;
     } catch (e) {
-      setError('JSON 格式错误: ' + (e instanceof Error ? e.message : String(e)));
+      setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
-  }, []);
+  }, [tc]);
 
   const convertXmlToJson = useCallback((xml: string) => {
     if (isUpdatingRef.current) return;
@@ -62,9 +65,9 @@ export default function XmlJsonConverter() {
       setError('');
       isUpdatingRef.current = false;
     } catch (e) {
-      setError('XML 格式错误: ' + (e instanceof Error ? e.message : String(e)));
+      setError(tc('common.xmlFormatError', { detail: e instanceof Error ? e.message : String(e) }));
     }
-  }, []);
+  }, [tc]);
 
   const handleClear = () => {
     setJsonContent('');
@@ -80,15 +83,15 @@ export default function XmlJsonConverter() {
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">XML ↔ JSON</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">XML 与 JSON 格式双向转换</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{tool?.description}</p>
           </div>
           <button
             type="button"
             onClick={handleClear}
             className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 text-sm font-medium shadow-md"
           >
-            清空
+            {tc('common.clear')}
           </button>
         </div>
         {error && (
@@ -102,30 +105,30 @@ export default function XmlJsonConverter() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">JSON</label>
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelJson')}</label>
               {jsonContent && (
-                <button type="button" onClick={() => navigator.clipboard.writeText(jsonContent)} className="text-xs px-3 py-1 bg-green-500 text-white rounded-lg">复制</button>
+                <button type="button" onClick={() => navigator.clipboard.writeText(jsonContent)} className="text-xs px-3 py-1 bg-green-500 text-white rounded-lg">{tc('common.copy')}</button>
               )}
             </div>
             <textarea
               value={jsonContent}
               onChange={e => { setJsonContent(e.target.value); convertJsonToXml(e.target.value); }}
               className={textareaClass}
-              placeholder='{"root": {}}'
+              placeholder={t('placeholderJson')}
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">XML</label>
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelXml')}</label>
               {xmlContent && (
-                <button type="button" onClick={() => navigator.clipboard.writeText(xmlContent)} className="text-xs px-3 py-1 bg-green-500 text-white rounded-lg">复制</button>
+                <button type="button" onClick={() => navigator.clipboard.writeText(xmlContent)} className="text-xs px-3 py-1 bg-green-500 text-white rounded-lg">{tc('common.copy')}</button>
               )}
             </div>
             <textarea
               value={xmlContent}
               onChange={e => { setXmlContent(e.target.value); convertXmlToJson(e.target.value); }}
               className={textareaClass}
-              placeholder="<root></root>"
+              placeholder={t('placeholderXml')}
             />
           </div>
         </div>

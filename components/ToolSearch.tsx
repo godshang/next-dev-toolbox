@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { searchTools } from '@/lib/tools-search';
-import { tools } from '@/lib/tools-registry';
+import { useI18n } from '@/lib/i18n';
 
 interface ToolSearchProps {
   open: boolean;
@@ -11,6 +11,7 @@ interface ToolSearchProps {
 }
 
 export default function ToolSearch({ open, onClose, onSelect }: ToolSearchProps) {
+  const { t, tools } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(tools);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -21,15 +22,15 @@ export default function ToolSearch({ open, onClose, onSelect }: ToolSearchProps)
       setResults(tools);
       setActiveIndex(0);
     }
-  }, [open]);
+  }, [open, tools]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setResults(query.trim() ? searchTools(query) : tools);
+      setResults(query.trim() ? searchTools(query, tools) : tools);
       setActiveIndex(0);
     }, 200);
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, tools]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -77,7 +78,7 @@ export default function ToolSearch({ open, onClose, onSelect }: ToolSearchProps)
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="flex-1 text-sm bg-transparent outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
-            placeholder="搜索工具..."
+            placeholder={t('common.searchTools')}
           />
           <kbd className="hidden sm:inline text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
             ESC
@@ -86,7 +87,7 @@ export default function ToolSearch({ open, onClose, onSelect }: ToolSearchProps)
         <ul className="max-h-80 overflow-y-auto py-2">
           {results.length === 0 ? (
             <li className="px-4 py-6 text-sm text-center text-gray-500 dark:text-gray-400">
-              未找到匹配的工具
+              {t('common.noResults')}
             </li>
           ) : (
             results.map((tool, i) => (

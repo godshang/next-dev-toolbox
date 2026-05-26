@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 export default function Base64() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('base64');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [mode, setMode] = useState<'encode' | 'decode'>('encode');
@@ -31,8 +34,8 @@ export default function Base64() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Base64 编解码</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Base64 编码与解码工具</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
       
       <div className="p-8 space-y-6">
@@ -49,7 +52,7 @@ export default function Base64() {
                 : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50'
             }`}
           >
-            Encode
+            {tc('common.encode')}
           </button>
           <button
             onClick={() => {
@@ -63,7 +66,7 @@ export default function Base64() {
                 : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50'
             }`}
           >
-            Decode
+            {tc('common.decode')}
           </button>
         </div>
 
@@ -71,13 +74,13 @@ export default function Base64() {
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Input
+                {tc('common.input')}
               </label>
               <span
                 className="px-4 py-2 text-sm font-medium rounded-lg invisible pointer-events-none select-none"
                 aria-hidden
               >
-                Copy
+                {tc('common.copy')}
               </span>
             </div>
             <textarea
@@ -90,14 +93,14 @@ export default function Base64() {
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Output
+                {tc('common.output')}
               </label>
               <button
                 onClick={copyToClipboard}
                 disabled={!output}
                 className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Copy
+                {tc('common.copy')}
               </button>
             </div>
             <textarea

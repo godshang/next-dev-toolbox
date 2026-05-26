@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // 进制类型
 type Base = 2 | 8 | 10 | 16;
 
 // 进制配置
-const baseConfig: Record<Base, { name: string; prefix: string; placeholder: string }> = {
-  2: { name: '二进制', prefix: '0b', placeholder: '0b1010' },
-  8: { name: '八进制', prefix: '0o', placeholder: '0o12' },
-  10: { name: '十进制', prefix: '', placeholder: '10' },
-  16: { name: '十六进制', prefix: '0x', placeholder: '0xA' },
+const baseConfig: Record<Base, { placeholder: string }> = {
+  2: { placeholder: '0b1010' },
+  8: { placeholder: '0o12' },
+  10: { placeholder: '10' },
+  16: { placeholder: '0xA' },
 };
 
 // 将字符串转换为数字（支持不同进制）
@@ -70,6 +71,8 @@ function formatNumber(num: number, toBase: Base): string {
 }
 
 export default function NumberBaseConverter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('number-base');
   const [binary, setBinary] = useState('');
   const [octal, setOctal] = useState('');
   const [decimal, setDecimal] = useState('');
@@ -120,7 +123,7 @@ export default function NumberBaseConverter() {
     if (num !== null) {
       updateAllFormats(num);
     } else if (value.trim()) {
-      setError('无效的二进制格式（只能包含 0 和 1）');
+      setError(t('errorInvalidBinary'));
     } else {
       setError('');
     }
@@ -133,7 +136,7 @@ export default function NumberBaseConverter() {
     if (num !== null) {
       updateAllFormats(num);
     } else if (value.trim()) {
-      setError('无效的八进制格式（只能包含 0-7）');
+      setError(t('errorInvalidOctal'));
     } else {
       setError('');
     }
@@ -146,7 +149,7 @@ export default function NumberBaseConverter() {
     if (num !== null) {
       updateAllFormats(num);
     } else if (value.trim()) {
-      setError('无效的十进制格式');
+      setError(t('errorInvalidDecimal'));
     } else {
       setError('');
     }
@@ -159,7 +162,7 @@ export default function NumberBaseConverter() {
     if (num !== null) {
       updateAllFormats(num);
     } else if (value.trim()) {
-      setError('无效的十六进制格式（只能包含 0-9, A-F）');
+      setError(t('errorInvalidHex'));
     } else {
       setError('');
     }
@@ -190,21 +193,21 @@ export default function NumberBaseConverter() {
       <div className="flex-shrink-0 px-6 py-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">进制转换</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">二进制、八进制、十进制、十六进制互相转换</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleExample}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              示例
+              {t('btnExample')}
             </button>
             <button
               onClick={handleClear}
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              清空
+              {tc('common.clear')}
             </button>
           </div>
         </div>
@@ -223,14 +226,14 @@ export default function NumberBaseConverter() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                二进制 (Base 2)
+                {t('labelBinary')}
               </label>
               {binary && (
                 <button
                   onClick={() => handleCopy(binary)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -247,14 +250,14 @@ export default function NumberBaseConverter() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                八进制 (Base 8)
+                {t('labelOctal')}
               </label>
               {octal && (
                 <button
                   onClick={() => handleCopy(octal)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -271,14 +274,14 @@ export default function NumberBaseConverter() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                十进制 (Base 10)
+                {t('labelDecimal')}
               </label>
               {decimal && (
                 <button
                   onClick={() => handleCopy(decimal)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -295,14 +298,14 @@ export default function NumberBaseConverter() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                十六进制 (Base 16)
+                {t('labelHex')}
               </label>
               {hexadecimal && (
                 <button
                   onClick={() => handleCopy(hexadecimal)}
                   className="px-3 py-1 text-xs bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
                 >
-                  复制
+                  {tc('common.copy')}
                 </button>
               )}
             </div>
@@ -320,32 +323,32 @@ export default function NumberBaseConverter() {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
             <span className="text-blue-500">ℹ️</span>
-            格式说明
+            {t('formatHelpTitle')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
             <div>
-              <p className="font-semibold mb-2">二进制 (Base 2):</p>
-              <p className="font-mono text-xs">前缀: 0b 或 0B</p>
-              <p className="font-mono text-xs">字符: 0, 1</p>
-              <p className="font-mono text-xs">示例: 0b1010 (十进制 10)</p>
+              <p className="font-semibold mb-2">{t('labelBinary')}:</p>
+              <p className="font-mono text-xs">{t('fmtBinPrefix')}</p>
+              <p className="font-mono text-xs">{t('fmtBinChars')}</p>
+              <p className="font-mono text-xs">{t('fmtBinExample')}</p>
             </div>
             <div>
-              <p className="font-semibold mb-2">八进制 (Base 8):</p>
-              <p className="font-mono text-xs">前缀: 0o 或 0O</p>
-              <p className="font-mono text-xs">字符: 0-7</p>
-              <p className="font-mono text-xs">示例: 0o12 (十进制 10)</p>
+              <p className="font-semibold mb-2">{t('labelOctal')}:</p>
+              <p className="font-mono text-xs">{t('fmtOctPrefix')}</p>
+              <p className="font-mono text-xs">{t('fmtOctChars')}</p>
+              <p className="font-mono text-xs">{t('fmtOctExample')}</p>
             </div>
             <div>
-              <p className="font-semibold mb-2">十进制 (Base 10):</p>
-              <p className="font-mono text-xs">前缀: 无</p>
-              <p className="font-mono text-xs">字符: 0-9, 支持负数</p>
-              <p className="font-mono text-xs">示例: 10</p>
+              <p className="font-semibold mb-2">{t('labelDecimal')}:</p>
+              <p className="font-mono text-xs">{t('fmtDecPrefix')}</p>
+              <p className="font-mono text-xs">{t('fmtDecChars')}</p>
+              <p className="font-mono text-xs">{t('fmtDecExample')}</p>
             </div>
             <div>
-              <p className="font-semibold mb-2">十六进制 (Base 16):</p>
-              <p className="font-mono text-xs">前缀: 0x 或 0X</p>
-              <p className="font-mono text-xs">字符: 0-9, A-F (不区分大小写)</p>
-              <p className="font-mono text-xs">示例: 0xA (十进制 10)</p>
+              <p className="font-semibold mb-2">{t('labelHex')}:</p>
+              <p className="font-mono text-xs">{t('fmtHexPrefix')}</p>
+              <p className="font-mono text-xs">{t('fmtHexChars')}</p>
+              <p className="font-mono text-xs">{t('fmtHexExample')}</p>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 // 将Date对象转换为 yyyy-MM-dd HH:mm:ss
 const formatDateTime = (date: Date): string => {
@@ -14,6 +15,8 @@ const formatDateTime = (date: Date): string => {
 };
 
 export default function TimestampConverter() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('timestamp');
   const [timestamp, setTimestamp] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [result, setResult] = useState<{ timestamp?: number; dateTime?: string }>({});
@@ -79,8 +82,8 @@ export default function TimestampConverter() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">时间戳转换</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">时间戳与日期时间相互转换</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
       
       <div className="p-8 space-y-6">
@@ -88,7 +91,7 @@ export default function TimestampConverter() {
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Timestamp (milliseconds)
+                {t('labelTimestamp')}
               </label>
               <div className="flex gap-3">
                 <input
@@ -96,20 +99,20 @@ export default function TimestampConverter() {
                   value={timestamp}
                   onChange={handleTimestampChange}
                   className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
-                  placeholder="Enter timestamp..."
+                  placeholder={t('placeholderTimestamp')}
                 />
                 <button
                   onClick={getCurrentTimestamp}
                   className="px-5 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
-                  Now
+                  {t('btnNow')}
                 </button>
                 {result.timestamp && (
                   <button
                     onClick={() => copyToClipboard(String(result.timestamp))}
                     className="px-5 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                   >
-                    Copy
+                    {tc('common.copy')}
                   </button>
                 )}
               </div>
@@ -117,14 +120,14 @@ export default function TimestampConverter() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Date & Time
+                {t('labelDateTime')}
               </label>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={dateTime}
                   onChange={handleDateTimeChange}
-                  placeholder="yyyy-MM-dd HH:mm:ss"
+                  placeholder={t('placeholderDateTime')}
                   className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 {result.dateTime && (
@@ -132,7 +135,7 @@ export default function TimestampConverter() {
                     onClick={() => copyToClipboard(result.dateTime || '')}
                     className="px-5 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                   >
-                    Copy
+                    {tc('common.copy')}
                   </button>
                 )}
               </div>
@@ -144,19 +147,19 @@ export default function TimestampConverter() {
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
               <span className="text-blue-500">📊</span>
-              Result
+              {t('resultTitle')}
             </h3>
             <div className="space-y-3 font-mono text-sm">
               <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">Timestamp:</span>
+                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">{t('resultTimestamp')}</span>
                 <span className="text-blue-600 dark:text-blue-400 font-semibold">{result.timestamp}</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">Date Time:</span>
+                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">{t('resultDateTime')}</span>
                 <span className="text-blue-600 dark:text-blue-400 font-semibold">{result.dateTime}</span>
               </div>
               <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">ISO String:</span>
+                <span className="text-gray-600 dark:text-gray-400 font-medium min-w-[100px]">{t('resultIso')}</span>
                 <span className="text-blue-600 dark:text-blue-400 font-semibold break-all">
                   {new Date(result.timestamp).toISOString()}
                 </span>

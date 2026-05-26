@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CryptoJS from 'crypto-js';
+import { useI18n, useToolPage } from '@/lib/i18n';
 
 type Mode = 'encrypt' | 'decrypt';
 type KeySize = 128 | 256;
@@ -22,6 +23,8 @@ function parseIv(iv: string): CryptoJS.lib.WordArray {
 }
 
 export default function AesCrypto() {
+  const { t: tc } = useI18n();
+  const { t, tool } = useToolPage('aes-crypto');
   const [mode, setMode] = useState<Mode>('encrypt');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
@@ -37,15 +40,15 @@ export default function AesCrypto() {
     setOutput('');
 
     if (!input.trim()) {
-      setError('请输入内容');
+      setError(t('errorEmptyInput'));
       return;
     }
     if (!key.trim()) {
-      setError('请输入密钥');
+      setError(t('errorEmptyKey'));
       return;
     }
     if (aesMode === 'CBC' && !iv.trim()) {
-      setError('CBC 模式需要 IV');
+      setError(t('errorCbcNeedsIv'));
       return;
     }
 
@@ -74,11 +77,12 @@ export default function AesCrypto() {
         }
         const decrypted = CryptoJS.AES.decrypt(ciphertext, parsedKey, options);
         const result = decrypted.toString(CryptoJS.enc.Utf8);
-        if (!result) throw new Error('解密失败，请检查密钥、IV 或密文格式');
+        if (!result) throw new Error(t('errorDecryptFailed'));
         setOutput(result);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : '操作失败');
+      const msg = e instanceof Error ? e.message : '';
+      setError(msg === t('errorDecryptFailed') ? msg : t('errorOperationFailed'));
     }
   };
 
@@ -92,13 +96,13 @@ export default function AesCrypto() {
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">AES 加解密</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">AES 对称加密与解密（仅本地处理）</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       <div className="p-8 space-y-6">
         <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
-          🔒 密钥与明文仅在浏览器本地处理，不会上传到服务器
+          {t('privacyNote')}
         </div>
 
         <div className="flex gap-3 bg-gray-100 dark:bg-gray-800/50 p-1.5 rounded-xl">
@@ -113,28 +117,28 @@ export default function AesCrypto() {
                   : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700/50'
               }`}
             >
-              {m === 'encrypt' ? '加密' : '解密'}
+              {m === 'encrypt' ? tc('common.encrypt') : tc('common.decrypt')}
             </button>
           ))}
         </div>
 
         <div className="flex flex-wrap gap-4">
           <div className="space-y-1">
-            <label className="text-xs text-gray-500 dark:text-gray-400">密钥长度</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('labelKeySize')}</label>
             <select value={keySize} onChange={e => setKeySize(Number(e.target.value) as KeySize)} className={selectClass}>
               <option value={128}>AES-128</option>
               <option value={256}>AES-256</option>
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-gray-500 dark:text-gray-400">模式</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('labelMode')}</label>
             <select value={aesMode} onChange={e => setAesMode(e.target.value as AesMode)} className={selectClass}>
               <option value="CBC">CBC</option>
               <option value="ECB">ECB</option>
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-gray-500 dark:text-gray-400">输出格式</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400">{t('labelOutputFormat')}</label>
             <select value={outputFormat} onChange={e => setOutputFormat(e.target.value as OutputFormat)} className={selectClass}>
               <option value="base64">Base64</option>
               <option value="hex">Hex</option>
@@ -144,24 +148,24 @@ export default function AesCrypto() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">密钥</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelKey')}</label>
             <input
               type="text"
               value={key}
               onChange={e => setKey(e.target.value)}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={keySize === 128 ? '16 字节密钥' : '32 字节密钥'}
+              placeholder={keySize === 128 ? t('placeholderKey128') : t('placeholderKey256')}
             />
           </div>
           {aesMode === 'CBC' && (
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">IV</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('labelIv')}</label>
               <input
                 type="text"
                 value={iv}
                 onChange={e => setIv(e.target.value)}
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="16 字节 IV"
+                placeholder={t('placeholderIv')}
               />
             </div>
           )}
@@ -169,13 +173,13 @@ export default function AesCrypto() {
 
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-            {mode === 'encrypt' ? '明文' : '密文'}
+            {mode === 'encrypt' ? t('labelPlaintext') : t('labelCiphertext')}
           </label>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={mode === 'encrypt' ? '输入要加密的内容...' : '输入要解密的内容...'}
+            placeholder={mode === 'encrypt' ? t('placeholderEncrypt') : t('placeholderDecrypt')}
           />
         </div>
 
@@ -184,7 +188,7 @@ export default function AesCrypto() {
           onClick={handleProcess}
           className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 shadow-md transition-all"
         >
-          {mode === 'encrypt' ? '加密' : '解密'}
+          {mode === 'encrypt' ? tc('common.encrypt') : tc('common.decrypt')}
         </button>
 
         {error && (
@@ -197,14 +201,14 @@ export default function AesCrypto() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {mode === 'encrypt' ? '密文' : '明文'}
+                {mode === 'encrypt' ? t('labelCiphertext') : t('labelPlaintext')}
               </label>
               <button
                 type="button"
                 onClick={copyToClipboard}
                 className="text-xs px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                复制
+                {tc('common.copy')}
               </button>
             </div>
             <textarea
