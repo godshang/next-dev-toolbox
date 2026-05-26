@@ -1,17 +1,24 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
+import { homePath } from '@/lib/i18n/routing';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
   onSearchOpen: () => void;
   onMenuToggle: () => void;
+  onHome?: () => void;
 }
 
-export default function Header({ onSearchOpen, onMenuToggle }: HeaderProps) {
+export default function Header({ onSearchOpen, onMenuToggle, onHome }: HeaderProps) {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+
+  const goHome = () => {
+    if (onHome) onHome();
+    else router.push(homePath(locale));
+  };
 
   return (
     <header className="sticky top-0 z-40 h-14 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm">
@@ -27,7 +34,7 @@ export default function Header({ onSearchOpen, onMenuToggle }: HeaderProps) {
 
         <button
           type="button"
-          onClick={() => router.push('/')}
+          onClick={goHome}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">

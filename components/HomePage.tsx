@@ -9,6 +9,7 @@ import {
 } from '@/lib/tools-registry';
 import { getRecentTools, getFavoriteTools } from '@/lib/tools-storage';
 import { useI18n } from '@/lib/i18n';
+import { toolPath } from '@/lib/i18n/routing';
 
 function QuickLinks({
   title,
@@ -49,7 +50,7 @@ function QuickLinks({
 
 export default function HomePage() {
   const router = useRouter();
-  const { t, messages, getTool } = useI18n();
+  const { t, messages, getTool, locale } = useI18n();
   const [recentIds, setRecentIds] = useState<string[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [showMisc, setShowMisc] = useState(false);
@@ -60,7 +61,7 @@ export default function HomePage() {
   }, []);
 
   const handleToolClick = (toolId: string) => {
-    router.push(`/?tool=${toolId}`);
+    router.push(toolPath(locale, toolId));
   };
 
   const mainCategories = categoryOrder.filter(c => c !== 'Misc');

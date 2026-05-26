@@ -11,4 +11,15 @@ export {
   type Locale,
 } from './locales';
 export { localizeTools, type LocalizedToolItem } from './tools';
+export {
+  LOCALE_PATH_SEGMENTS,
+  homePath,
+  toolPath,
+  replacePathLocale,
+  segmentToLocale,
+  localeToSegment,
+  isLocalePathSegment,
+  isValidToolId,
+  type LocalePathSegment,
+} from './routing';
 export type { Messages, ToolMessages, CategoryMessages } from './types';

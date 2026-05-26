@@ -1,9 +1,23 @@
 'use client';
 
-import { useI18n, localeLabels, SUPPORTED_LOCALES, type Locale } from '@/lib/i18n';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  useI18n,
+  localeLabels,
+  SUPPORTED_LOCALES,
+  type Locale,
+} from '@/lib/i18n';
+import { replacePathLocale } from '@/lib/i18n/routing';
 
 export default function LocaleSwitcher() {
   const { locale, setLocale, t } = useI18n();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const switchTo = (next: Locale) => {
+    setLocale(next);
+    router.push(replacePathLocale(pathname, next));
+  };
 
   return (
     <div
@@ -18,7 +32,7 @@ export default function LocaleSwitcher() {
         <button
           key={loc}
           type="button"
-          onClick={() => setLocale(loc as Locale)}
+          onClick={() => switchTo(loc)}
           className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
             locale === loc
               ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-300 font-medium shadow-sm'
@@ -26,7 +40,7 @@ export default function LocaleSwitcher() {
           }`}
           aria-pressed={locale === loc}
         >
-          {localeLabels[loc as Locale]}
+          {localeLabels[loc]}
         </button>
       ))}
     </div>

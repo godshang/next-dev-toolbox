@@ -12,7 +12,6 @@ import {
 import {
   DEFAULT_LOCALE,
   LOCALE_STORAGE_KEY,
-  resolveInitialLocale,
   type Locale,
 } from './locales';
 import { getMessages } from './messages';
@@ -31,18 +30,25 @@ type I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-  const [hydrated, setHydrated] = useState(false);
+type I18nProviderProps = {
+  children: ReactNode;
+  /** Locale from URL segment; drives SSR metadata alignment */
+  initialLocale?: Locale;
+};
+
+export function I18nProvider({ children, initialLocale = DEFAULT_LOCALE }: I18nProviderProps) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   useEffect(() => {
-    setLocaleState(resolveInitialLocale());
-    setHydrated(true);
-  }, []);
+    setLocaleState(initialLocale);
+    localStorage.setItem(LOCALE_STORAGE_KEY, initialLocale);
+    document.cookie = `${LOCALE_STORAGE_KEY}=${initialLocale};path=/;max-age=31536000;samesite=lax`;
+  }, [initialLocale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
     localStorage.setItem(LOCALE_STORAGE_KEY, next);
+    document.cookie = `${LOCALE_STORAGE_KEY}=${next};path=/;max-age=31536000;samesite=lax`;
   }, []);
 
   const messages = useMemo(() => getMessages(locale), [locale]);
@@ -55,10 +61,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (!hydrated) return;
     document.documentElement.lang = locale === 'zh-CN' ? 'zh-CN' : 'en';
     document.title = messages.meta.title;
-  }, [hydrated, locale, messages.meta.title]);
+  }, [locale, messages.meta.title]);
 
   const value = useMemo<I18nContextValue>(
     () => ({ locale, setLocale, messages, t, tools, getTool }),
