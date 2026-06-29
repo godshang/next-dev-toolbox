@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useI18n, useToolPage } from '@/lib/i18n';
 
 // JSON 语法高亮函数
@@ -121,8 +121,32 @@ export default function JsonFormat() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const lineNumberRef = useRef<HTMLDivElement>(null);
+  const shouldResetScrollRef = useRef(false);
 
   const lineCount = useMemo(() => Math.max(1, content.split('\n').length), [content]);
+
+  const resetEditorScroll = () => {
+    const textarea = textareaRef.current;
+    const highlight = highlightRef.current;
+    const lineNumbers = lineNumberRef.current;
+    if (!textarea) return;
+
+    textarea.scrollLeft = 0;
+    textarea.scrollTop = 0;
+    if (highlight) {
+      highlight.scrollLeft = 0;
+      highlight.scrollTop = 0;
+    }
+    if (lineNumbers) {
+      lineNumbers.scrollTop = 0;
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (!shouldResetScrollRef.current) return;
+    shouldResetScrollRef.current = false;
+    resetEditorScroll();
+  }, [content]);
 
   // 同步滚动（高亮层 + 行号）
   useEffect(() => {
@@ -147,6 +171,7 @@ export default function JsonFormat() {
       setError('');
       const parsed = JSON.parse(content);
       const formatted = JSON.stringify(parsed, null, 2);
+      shouldResetScrollRef.current = true;
       setContent(formatted);
     } catch (e) {
       setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
@@ -158,6 +183,7 @@ export default function JsonFormat() {
       setError('');
       const parsed = JSON.parse(content);
       const minified = JSON.stringify(parsed);
+      shouldResetScrollRef.current = true;
       setContent(minified);
     } catch (e) {
       setError(tc('common.jsonFormatError', { detail: e instanceof Error ? e.message : String(e) }));
@@ -265,6 +291,9 @@ export default function JsonFormat() {
             onChange={(e) => {
               setContent(e.target.value);
               setError('');
+            }}
+            onPaste={() => {
+              shouldResetScrollRef.current = true;
             }}
             className="absolute inset-0 w-full h-full p-6 border-0 bg-transparent text-transparent caret-blue-600 dark:caret-blue-400 font-mono text-sm leading-6 whitespace-pre resize-none focus:outline-none overflow-auto"
             placeholder=""
