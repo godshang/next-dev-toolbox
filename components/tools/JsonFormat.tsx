@@ -113,6 +113,18 @@ const escapeHtml = (text: string): string => {
   return div.innerHTML;
 };
 
+/** 仅转义引号与反斜杠：\\ → \\\\，" → \\" */
+const escapeJsonText = (text: string): string =>
+  text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+/** 去除一层引号与反斜杠转义：\\" → "，\\\\ → \\ */
+const unescapeJsonText = (text: string): string =>
+  text.replace(/\\(.)/g, (match, char: string) => {
+    if (char === '"') return '"';
+    if (char === '\\') return '\\';
+    return match;
+  });
+
 export default function JsonFormat() {
   const { t: tc } = useI18n();
   const { t, tool } = useToolPage('json-format');
@@ -190,6 +202,20 @@ export default function JsonFormat() {
     }
   };
 
+  const handleEscape = () => {
+    if (!content) return;
+    setError('');
+    shouldResetScrollRef.current = true;
+    setContent(escapeJsonText(content));
+  };
+
+  const handleUnescape = () => {
+    if (!content) return;
+    setError('');
+    shouldResetScrollRef.current = true;
+    setContent(unescapeJsonText(content));
+  };
+
   const handleClear = () => {
     setContent('');
     setError('');
@@ -212,7 +238,7 @@ export default function JsonFormat() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tool?.name ?? ''}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 justify-end">
             <button
               onClick={handleFormat}
               className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -226,6 +252,20 @@ export default function JsonFormat() {
               className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               {tc('common.minify')}
+            </button>
+            <button
+              onClick={handleUnescape}
+              disabled={!content}
+              className="px-5 py-2.5 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-lg hover:from-violet-600 hover:to-violet-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {t('unescape')}
+            </button>
+            <button
+              onClick={handleEscape}
+              disabled={!content}
+              className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {t('escape')}
             </button>
             <button
               onClick={handleClear}
@@ -294,6 +334,12 @@ export default function JsonFormat() {
             }}
             onPaste={() => {
               shouldResetScrollRef.current = true;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                handleFormat();
+              }
             }}
             className="absolute inset-0 w-full h-full p-6 border-0 bg-transparent text-transparent caret-blue-600 dark:caret-blue-400 font-mono text-sm leading-6 whitespace-pre resize-none focus:outline-none overflow-auto"
             placeholder=""

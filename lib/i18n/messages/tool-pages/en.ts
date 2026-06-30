@@ -5,6 +5,9 @@ export const toolPagesEn = {
     subtitle: 'Format, minify, and beautify JSON data',
     emptyHint: 'Paste or enter JSON here...',
     emptyHintSub: 'Real-time syntax highlighting supported',
+    escape: 'Escape',
+    unescape: 'Unescape',
+    unescapeError: 'Unescape failed: {detail}',
   },
   'json-view': {
     subtitle: 'Visualize JSON data structure',

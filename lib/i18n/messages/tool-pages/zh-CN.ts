@@ -5,6 +5,9 @@ export const toolPagesZhCN = {
     subtitle: '格式化、压缩和美化 JSON 数据',
     emptyHint: '在此粘贴或输入 JSON...',
     emptyHintSub: '支持实时语法高亮',
+    escape: '添加转义',
+    unescape: '去除转义',
+    unescapeError: '去除转义失败：{detail}',
   },
   'json-view': {
     subtitle: '可视化 JSON 数据结构',
