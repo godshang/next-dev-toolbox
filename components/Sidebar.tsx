@@ -65,7 +65,7 @@ export default function Sidebar({
                 key={tool.id}
                 type="button"
                 onClick={() => handleToolClick(tool.id)}
-                className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${
+                className={`w-full cursor-pointer text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${
                   activeTool === tool.id
                     ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -92,7 +92,7 @@ export default function Sidebar({
               <button
                 type="button"
                 onClick={() => toggleCategory(category)}
-                className="w-full flex items-center gap-2 px-2 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="w-full cursor-pointer flex items-center gap-2 px-2 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <span>{meta.icon}</span>
                 <span className="flex-1 text-left">{catMsg.name}</span>
@@ -108,7 +108,7 @@ export default function Sidebar({
                         key={tool.id}
                         type="button"
                         onClick={() => handleToolClick(tool.id)}
-                        className={`w-full text-left pl-6 pr-2 py-1.5 text-sm rounded-lg flex items-center gap-2 transition-all ${
+                        className={`w-full cursor-pointer text-left pl-6 pr-2 py-1.5 text-sm rounded-lg flex items-center gap-2 transition-all ${
                           activeTool === tool.id
                             ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 font-medium border-l-4 border-blue-500'
                             : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'

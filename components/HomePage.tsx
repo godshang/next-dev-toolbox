@@ -36,7 +36,7 @@ function QuickLinks({
               key={id}
               type="button"
               onClick={() => onToolClick(id)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="inline-flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               <span>{tool.icon}</span>
               <span>{tool.name}</span>
@@ -109,7 +109,7 @@ export default function HomePage() {
                     <button
                       key={tool.id}
                       onClick={() => handleToolClick(tool.id)}
-                      className="group relative p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-xl hover:-translate-y-1 text-left"
+                      className="group relative cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-xl hover:-translate-y-1 text-left"
                     >
                       <div className="flex items-start gap-4">
                         <div className="text-3xl group-hover:scale-110 transition-transform duration-200">
@@ -136,7 +136,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setShowMisc(prev => !prev)}
-            className="flex items-center gap-3 mb-6 w-full text-left group"
+            className="group flex cursor-pointer items-center gap-3 mb-6 w-full text-left"
           >
             <span className="text-3xl">{categoryMeta.Misc.icon}</span>
             <div className="flex-1">
@@ -156,7 +156,7 @@ export default function HomePage() {
                   <button
                     key={tool.id}
                     onClick={() => handleToolClick(tool.id)}
-                    className="group relative p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 transition-all duration-200 hover:shadow-xl text-left"
+                    className="group relative cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 transition-all duration-200 hover:shadow-xl text-left"
                   >
                     <div className="flex items-start gap-4">
                       <div className="text-3xl">{tool.icon}</div>
